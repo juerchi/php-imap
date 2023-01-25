@@ -25,7 +25,8 @@ use Webklex\PHPIMAP\Traits\HasEvents;
  *
  * @package Webklex\PHPIMAP
  */
-class Folder {
+class Folder
+{
     use HasEvents;
 
     /**
@@ -119,16 +120,17 @@ class Folder {
      * @param string $delimiter
      * @param string[] $attributes
      */
-    public function __construct(Client $client, string $folder_name, string $delimiter, array $attributes) {
+    public function __construct(Client $client, string $folder_name, string $delimiter, array $attributes)
+    {
         $this->client = $client;
 
         $this->events["message"] = $client->getDefaultEvents("message");
         $this->events["folder"] = $client->getDefaultEvents("folder");
 
         $this->setDelimiter($delimiter);
-        $this->path      = $folder_name;
-        $this->full_name  = $this->decodeName($folder_name);
-        $this->name      = $this->getSimpleName($this->delimiter, $this->full_name);
+        $this->path = $folder_name;
+        $this->full_name = $this->decodeName($folder_name);
+        $this->name = $this->getSimpleName($this->delimiter, $this->full_name);
 
         $this->parseAttributes($attributes);
     }
@@ -141,7 +143,8 @@ class Folder {
      * @throws Exceptions\ConnectionFailedException
      * @throws Exceptions\RuntimeException
      */
-    public function query(array $extensions = []): WhereQuery {
+    public function query(array $extensions = []): WhereQuery
+    {
         $this->getClient()->checkConnection();
         $this->getClient()->openFolder($this->path);
         $extensions = count($extensions) > 0 ? $extensions : $this->getClient()->extensions;
@@ -157,7 +160,8 @@ class Folder {
      * @throws Exceptions\ConnectionFailedException
      * @throws Exceptions\RuntimeException
      */
-    public function search(array $extensions = []): WhereQuery {
+    public function search(array $extensions = []): WhereQuery
+    {
         return $this->query($extensions);
     }
 
@@ -169,7 +173,8 @@ class Folder {
      * @throws Exceptions\ConnectionFailedException
      * @throws Exceptions\RuntimeException
      */
-    public function messages(array $extensions = []): WhereQuery {
+    public function messages(array $extensions = []): WhereQuery
+    {
         return $this->query($extensions);
     }
 
@@ -178,7 +183,8 @@ class Folder {
      *
      * @return bool
      */
-    public function hasChildren(): bool {
+    public function hasChildren(): bool
+    {
         return $this->has_children;
     }
 
@@ -188,7 +194,8 @@ class Folder {
      *
      * @return self
      */
-    public function setChildren($children = []): Folder {
+    public function setChildren($children = []): Folder
+    {
         $this->children = $children;
 
         return $this;
@@ -201,7 +208,8 @@ class Folder {
      *
      * @return array|false|string|string[]|null
      */
-    protected function decodeName($name) {
+    protected function decodeName($name)
+    {
         return mb_convert_encoding($name, "UTF-8", "UTF7-IMAP");
     }
 
@@ -212,7 +220,8 @@ class Folder {
      *
      * @return mixed
      */
-    protected function getSimpleName($delimiter, $full_name) {
+    protected function getSimpleName($delimiter, $full_name)
+    {
         $arr = explode($delimiter, $full_name);
 
         return end($arr);
@@ -222,11 +231,12 @@ class Folder {
      * Parse attributes and set it to object properties.
      * @param $attributes
      */
-    protected function parseAttributes($attributes) {
+    protected function parseAttributes($attributes)
+    {
         $this->no_inferiors = in_array('\NoInferiors', $attributes);
-        $this->no_select    = in_array('\NoSelect', $attributes);
-        $this->marked       = in_array('\Marked', $attributes);
-        $this->referral     = in_array('\Referral', $attributes);
+        $this->no_select = in_array('\NoSelect', $attributes);
+        $this->marked = in_array('\Marked', $attributes);
+        $this->referral = in_array('\Referral', $attributes);
         $this->has_children = in_array('\HasChildren', $attributes);
     }
 
@@ -241,10 +251,13 @@ class Folder {
      * @throws Exceptions\FolderFetchingException
      * @throws Exceptions\RuntimeException
      */
-    public function move(string $new_name, bool $expunge = true): bool {
+    public function move(string $new_name, bool $expunge = true): bool
+    {
         $this->client->checkConnection();
         $status = $this->client->getConnection()->renameFolder($this->full_name, $new_name);
-        if($expunge) $this->client->expunge();
+        if ($expunge) {
+            $this->client->expunge();
+        }
 
         $folder = $this->client->getFolder($new_name);
         $event = $this->getEvent("folder", "moved");
@@ -263,10 +276,12 @@ class Folder {
      * @throws Exceptions\MessageNotFoundException
      * @throws Exceptions\RuntimeException
      */
-    public function overview(string $sequence = null): array {
+    public function overview(string $sequence = null): array
+    {
         $this->client->openFolder($this->path);
         $sequence = $sequence === null ? "1:*" : $sequence;
         $uid = ClientManager::get('options.sequence', IMAP::ST_MSGN) == IMAP::ST_UID;
+
         return $this->client->getConnection()->overview($sequence, $uid);
     }
 
@@ -280,14 +295,15 @@ class Folder {
      * @throws Exceptions\ConnectionFailedException
      * @throws Exceptions\RuntimeException
      */
-    public function appendMessage(string $message, array $options = null, $internal_date = null): bool {
+    public function appendMessage(string $message, array $options = null, $internal_date = null): bool
+    {
         /**
          * Check if $internal_date is parsed. If it is null it should not be set. Otherwise, the message can't be stored.
          * If this parameter is set, it will set the INTERNALDATE on the appended message. The parameter should be a
          * date string that conforms to the rfc2060 specifications for a date_time value or be a Carbon object.
          */
 
-        if ($internal_date instanceof Carbon){
+        if ($internal_date instanceof Carbon) {
             $internal_date = $internal_date->format('d-M-Y H:i:s O');
         }
 
@@ -305,7 +321,8 @@ class Folder {
      * @throws Exceptions\FolderFetchingException
      * @throws Exceptions\RuntimeException
      */
-    public function rename(string $new_name, bool $expunge = true): bool {
+    public function rename(string $new_name, bool $expunge = true): bool
+    {
         return $this->move($new_name, $expunge);
     }
 
@@ -318,9 +335,12 @@ class Folder {
      * @throws Exceptions\RuntimeException
      * @throws Exceptions\EventNotFoundException
      */
-    public function delete(bool $expunge = true): bool {
+    public function delete(bool $expunge = true): bool
+    {
         $status = $this->client->getConnection()->deleteFolder($this->path);
-        if($expunge) $this->client->expunge();
+        if ($expunge) {
+            $this->client->expunge();
+        }
 
         $event = $this->getEvent("folder", "deleted");
         $event::dispatch($this);
@@ -335,8 +355,10 @@ class Folder {
      * @throws Exceptions\ConnectionFailedException
      * @throws Exceptions\RuntimeException
      */
-    public function subscribe(): bool {
+    public function subscribe(): bool
+    {
         $this->client->openFolder($this->path);
+
         return $this->client->getConnection()->subscribeFolder($this->path);
     }
 
@@ -347,8 +369,10 @@ class Folder {
      * @throws Exceptions\ConnectionFailedException
      * @throws Exceptions\RuntimeException
      */
-    public function unsubscribe(): bool {
+    public function unsubscribe(): bool
+    {
         $this->client->openFolder($this->path);
+
         return $this->client->getConnection()->unsubscribeFolder($this->path);
     }
 
@@ -368,7 +392,8 @@ class Folder {
      * @throws Exceptions\MessageNotFoundException
      * @throws Exceptions\NotSupportedCapabilityException
      */
-    public function idle(callable $callback, int $timeout = 300, bool $auto_reconnect = false) {
+    public function idle(callable $callback, int $timeout = 300, bool $auto_reconnect = false)
+    {
         $this->client->setTimeout($timeout);
         if (!in_array("IDLE", $this->client->getConnection()->getCapabilities())) {
             throw new NotSupportedCapabilityException("IMAP server does not support IDLE");
@@ -386,7 +411,7 @@ class Folder {
 
                 if (($pos = strpos($line, "EXISTS")) !== false) {
                     $connection->done();
-                    $msgn = (int) substr($line, 2, $pos -2);
+                    $msgn = (int)substr($line, 2, $pos - 2);
 
                     $this->client->openFolder($this->path, true);
                     $message = $this->query()->getMessageByMsgn($msgn);
@@ -400,13 +425,13 @@ class Folder {
                     $connection->done();
                     $connection->idle();
                 }
-            }catch (Exceptions\RuntimeException $e) {
-                if(strpos($e->getMessage(), "empty response") >= 0 && $connection->connected()) {
+            } catch (Exceptions\RuntimeException $e) {
+                if (strpos($e->getMessage(), "empty response") >= 0 && $connection->connected()) {
                     $connection->done();
                     $connection->idle();
                     continue;
                 }
-                if(strpos($e->getMessage(), "connection closed") === false) {
+                if (strpos($e->getMessage(), "connection closed") === false) {
                     throw $e;
                 }
 
@@ -426,7 +451,8 @@ class Folder {
      * @throws Exceptions\ConnectionFailedException
      * @throws Exceptions\RuntimeException
      */
-    public function getStatus(): array {
+    public function getStatus(): array
+    {
         return $this->examine();
     }
 
@@ -437,6 +463,7 @@ class Folder {
     public function loadStatus(): Folder
     {
         $this->status = $this->getStatus();
+
         return $this;
     }
 
@@ -447,8 +474,10 @@ class Folder {
      * @throws Exceptions\ConnectionFailedException
      * @throws Exceptions\RuntimeException
      */
-    public function examine(): array {
+    public function examine(): array
+    {
         $result = $this->client->getConnection()->examineFolder($this->path);
+
         return is_array($result) ? $result : [];
     }
 
@@ -457,7 +486,8 @@ class Folder {
      *
      * @return Client
      */
-    public function getClient(): Client {
+    public function getClient(): Client
+    {
         return $this->client;
     }
 
@@ -465,8 +495,9 @@ class Folder {
      * Set the delimiter
      * @param $delimiter
      */
-    public function setDelimiter($delimiter){
-        if(in_array($delimiter, [null, '', ' ', false]) === true) {
+    public function setDelimiter($delimiter)
+    {
+        if (in_array($delimiter, [null, '', ' ', false]) === true) {
             $delimiter = ClientManager::get('options.delimiter', '/');
         }
 

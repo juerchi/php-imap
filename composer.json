@@ -19,14 +19,14 @@
         }
     ],
     "require": {
-        "php": ">=7.0.0",
+        "php": ">=8.1.0",
         "ext-openssl": "*",
         "ext-json": "*",
         "ext-mbstring": "*",
         "ext-iconv": "*",
         "ext-fileinfo": "*",
         "nesbot/carbon": ">=1.0",
-        "symfony/http-foundation": ">=2.8.0",
+        "symfony/http-foundation": ">=6.1.0",
         "illuminate/pagination": ">=5.0.0"
     },
     "require-dev": {
