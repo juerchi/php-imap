@@ -73,8 +73,6 @@ interface ProtocolInterface {
 
     /**
      * Check if the current session is connected
-     *
-     * @return bool
      */
     public function connected(): bool;
 
@@ -182,7 +180,7 @@ interface ProtocolInterface {
      * @return bool|array new flags if $silent is false, else true or false depending on success
      * @throws RuntimeException
      */
-    public function store(array $flags, int $from, $to = null, $mode = null, bool $silent = true, $uid = IMAP::ST_UID, $item = null);
+    public function store(array $flags, int $from, int $to = null, $mode = null, bool $silent = true, $uid = IMAP::ST_UID, $item = null);
 
     /**
      * Append a new message to given folder

@@ -13,9 +13,10 @@
 namespace Webklex\PHPIMAP;
 
 use ErrorException;
+use Psr\Log\LoggerInterface;
 use Webklex\PHPIMAP\Connection\Protocols\ImapProtocol;
 use Webklex\PHPIMAP\Connection\Protocols\LegacyProtocol;
-use Webklex\PHPIMAP\Connection\Protocols\Protocol;
+use Webklex\PHPIMAP\Connection\Protocols\AbstractProtocol;
 use Webklex\PHPIMAP\Connection\Protocols\ProtocolInterface;
 use Webklex\PHPIMAP\Exceptions\AuthFailedException;
 use Webklex\PHPIMAP\Exceptions\ConnectionFailedException;
@@ -39,51 +40,40 @@ class Client
     /**
      * Connection resource
      *
-     * @var boolean|Protocol|ProtocolInterface
+     * @var boolean|AbstractProtocol|ProtocolInterface
      */
     public $connection = false;
 
     /**
      * Server hostname.
-     *
-     * @var string
      */
-    public $host;
+    public string $host;
 
     /**
      * Server port.
-     *
-     * @var int
      */
-    public $port;
+    public int $port;
 
     /**
      * Service protocol.
-     *
-     * @var int
      */
-    public $protocol;
+    public string $protocol;
 
     /**
      * Server encryption.
      * Supported: none, ssl, tls, starttls or notls.
-     *
-     * @var string
      */
-    public $encryption;
+    public string $encryption;
 
     /**
      * If server has to validate cert.
-     *
-     * @var bool
      */
-    public $validate_cert = true;
+    public bool $validate_cert = true;
 
     /**
      * Proxy settings
-     * @var array
      */
-    protected $proxy = [
+    protected array $proxy = [
         'socket' => null,
         'request_fulluri' => false,
         'username' => null,
@@ -92,65 +82,50 @@ class Client
 
     /**
      * Connection timeout
-     * @var int $timeout
      */
-    public $timeout;
+    public int $timeout;
 
     /**
-     * Account username/
-     *
-     * @var mixed
+     * Account username
      */
-    public $username;
+    public string $username;
 
     /**
      * Account password.
-     *
-     * @var string
      */
-    public $password;
+    public string $password;
 
     /**
      * Additional data fetched from the server.
-     *
-     * @var string
      */
-    public $extensions;
+    public array $extensions;
 
     /**
      * Account authentication method.
-     *
-     * @var string
      */
-    public $authentication;
+    public ?string $authentication;
 
     /**
      * Active folder path.
-     *
-     * @var string
      */
-    protected $active_folder = null;
+    protected ?string $active_folder = null;
 
     /**
      * Default message mask
      *
      * @var string $default_message_mask
      */
-    protected $default_message_mask = MessageMask::class;
+    protected string $default_message_mask = MessageMask::class;
 
     /**
      * Default attachment mask
-     *
-     * @var string $default_attachment_mask
      */
-    protected $default_attachment_mask = AttachmentMask::class;
+    protected string $default_attachment_mask = AttachmentMask::class;
 
     /**
      * Used default account values
-     *
-     * @var array $default_account_config
      */
-    protected $default_account_config = [
+    protected array $default_account_config = [
         'host' => 'localhost',
         'port' => 993,
         'protocol' => 'imap',
@@ -168,6 +143,8 @@ class Client
         ],
         "timeout" => 30,
     ];
+
+    protected ?LoggerInterface $logger = null;
 
     /**
      * Client constructor.
@@ -190,6 +167,11 @@ class Client
         $this->disconnect();
     }
 
+    public function setLogger(?LoggerInterface $logger): void
+    {
+        $this->logger = $logger;
+    }
+
     /**
      * Set the Client configuration
      * @param array $config
@@ -210,9 +192,6 @@ class Client
 
     /**
      * Set a specific account config
-     * @param string $key
-     * @param array $config
-     * @param array $default_config
      */
     private function setAccountConfig(string $key, array $config, array $default_config)
     {
@@ -229,7 +208,7 @@ class Client
      * Look for a possible events in any available config
      * @param $config
      */
-    protected function setEventsFromConfig($config)
+    protected function setEventsFromConfig($config): void
     {
         $this->events = ClientManager::get("events");
         if (isset($config['events'])) {
@@ -245,7 +224,7 @@ class Client
      *
      * @throws MaskNotFoundException
      */
-    protected function setMaskFromConfig($config)
+    protected function setMaskFromConfig($config): void
     {
         $default_config = ClientManager::get("masks");
 
@@ -295,7 +274,7 @@ class Client
     /**
      * Get the current imap resource
      *
-     * @return bool|Protocol|ProtocolInterface
+     * @return bool|AbstractProtocol|ProtocolInterface
      * @throws ConnectionFailedException
      */
     public function getConnection()
@@ -307,8 +286,6 @@ class Client
 
     /**
      * Determine if connection was established.
-     *
-     * @return bool
      */
     public function isConnected(): bool
     {
@@ -320,7 +297,7 @@ class Client
      *
      * @throws ConnectionFailedException
      */
-    public function checkConnection()
+    public function checkConnection(): void
     {
         if (!$this->isConnected()) {
             $this->connect();
@@ -332,7 +309,7 @@ class Client
      *
      * @throws ConnectionFailedException
      */
-    public function reconnect()
+    public function reconnect(): void
     {
         if ($this->isConnected()) {
             $this->disconnect();
@@ -355,19 +332,20 @@ class Client
             $this->connection = new ImapProtocol($this->validate_cert, $this->encryption);
             $this->connection->setConnectionTimeout($this->timeout);
             $this->connection->setProxy($this->proxy);
+            $this->connection->setLogger($this->logger);
         } else {
             if (extension_loaded('imap') === false) {
                 throw new ConnectionFailedException(
                     "connection setup failed",
-                    0,
-                    new ProtocolNotSupportedException($protocol." is an unsupported protocol")
+                    previous: new ProtocolNotSupportedException($protocol." is an unsupported protocol")
                 );
             }
             $this->connection = new LegacyProtocol($this->validate_cert, $this->encryption);
-            if (strpos($protocol, "legacy-") === 0) {
+            if (str_starts_with($protocol, 'legacy-')) {
                 $protocol = substr($protocol, 7);
             }
             $this->connection->setProtocol($protocol);
+            $this->connection->setLogger($this->logger);
         }
 
         if (ClientManager::get('options.debug')) {
@@ -380,9 +358,7 @@ class Client
 
         try {
             $this->connection->connect($this->host, $this->port);
-        } catch (ErrorException $e) {
-            throw new ConnectionFailedException("connection setup failed", 0, $e);
-        } catch (Exceptions\RuntimeException $e) {
+        } catch (ErrorException|Exceptions\RuntimeException $e) {
             throw new ConnectionFailedException("connection setup failed", 0, $e);
         }
         $this->authenticate();
@@ -395,10 +371,10 @@ class Client
      *
      * @throws ConnectionFailedException
      */
-    protected function authenticate()
+    protected function authenticate(): void
     {
         try {
-            if ($this->authentication == "oauth") {
+            if ($this->authentication === 'oauth') {
                 if (!$this->connection->authenticate($this->username, $this->password)) {
                     throw new AuthFailedException();
                 }
@@ -427,15 +403,12 @@ class Client
 
     /**
      * Get a folder instance by a folder name
-     * @param string $folder_name
-     * @param string|bool|null $delimiter
      *
-     * @return Folder|null
      * @throws ConnectionFailedException
      * @throws FolderFetchingException
      * @throws Exceptions\RuntimeException
      */
-    public function getFolder(string $folder_name, $delimiter = null)
+    public function getFolder(string $folder_name, string|bool|null $delimiter = null): ?Folder
     {
         if ($delimiter !== false && $delimiter !== null) {
             return $this->getFolderByPath($folder_name);
@@ -443,7 +416,7 @@ class Client
 
         // Set delimiter to false to force selection via getFolderByName (maybe useful for uncommon folder names)
         $delimiter = is_null($delimiter) ? ClientManager::get('options.delimiter', "/") : $delimiter;
-        if (strpos($folder_name, (string)$delimiter) !== false) {
+        if (str_contains($folder_name, (string) $delimiter)) {
             return $this->getFolderByPath($folder_name);
         }
 
@@ -454,12 +427,11 @@ class Client
      * Get a folder instance by a folder name
      * @param $folder_name
      *
-     * @return Folder|null
      * @throws ConnectionFailedException
      * @throws FolderFetchingException
      * @throws Exceptions\RuntimeException
      */
-    public function getFolderByName($folder_name)
+    public function getFolderByName($folder_name): ?Folder
     {
         return $this->getFolders(false)->where("name", $folder_name)->first();
     }
@@ -468,12 +440,11 @@ class Client
      * Get a folder instance by a folder path
      * @param $folder_path
      *
-     * @return Folder|null
      * @throws ConnectionFailedException
      * @throws FolderFetchingException
      * @throws Exceptions\RuntimeException
      */
-    public function getFolderByPath($folder_path)
+    public function getFolderByPath($folder_path): ?Folder
     {
         return $this->getFolders(false)->where("path", $folder_path)->first();
     }
@@ -482,15 +453,11 @@ class Client
      * Get folders list.
      * If hierarchical order is set to true, it will make a tree of folders, otherwise it will return flat array.
      *
-     * @param boolean $hierarchical
-     * @param string|null $parent_folder
-     *
-     * @return FolderCollection
      * @throws ConnectionFailedException
      * @throws FolderFetchingException
      * @throws Exceptions\RuntimeException
      */
-    public function getFolders(bool $hierarchical = true, string $parent_folder = null): FolderCollection
+    public function getFolders(bool $hierarchical = true, ?string $parent_folder = null): FolderCollection
     {
         $this->checkConnection();
         $folders = FolderCollection::make([]);
@@ -498,24 +465,20 @@ class Client
         $pattern = $parent_folder.($hierarchical ? '%' : '*');
         $items = $this->connection->folders('', $pattern);
 
-        if (is_array($items)) {
-            foreach ($items as $folder_name => $item) {
-                $folder = new Folder($this, $folder_name, $item["delimiter"], $item["flags"]);
+        foreach ($items as $folder_name => $item) {
+            $folder = new Folder($this, $folder_name, $item["delimiter"], $item["flags"]);
 
-                if ($hierarchical && $folder->hasChildren()) {
-                    $pattern = $folder->full_name.$folder->delimiter.'%';
+            if ($hierarchical && $folder->hasChildren()) {
+                $pattern = $folder->full_name.$folder->delimiter.'%';
 
-                    $children = $this->getFolders(true, $pattern);
-                    $folder->setChildren($children);
-                }
-
-                $folders->push($folder);
+                $children = $this->getFolders(true, $pattern);
+                $folder->setChildren($children);
             }
 
-            return $folders;
-        } else {
-            throw new FolderFetchingException("failed to fetch any folders");
+            $folders->push($folder);
         }
+
+        return $folders;
     }
 
     /**
@@ -538,25 +501,21 @@ class Client
         $pattern = $parent_folder.($hierarchical ? '%' : '*');
         $items = $this->connection->folders('', $pattern);
 
-        if (is_array($items)) {
-            foreach ($items as $folder_name => $item) {
-                $folder = new Folder($this, $folder_name, $item["delimiter"], $item["flags"]);
+        foreach ($items as $folder_name => $item) {
+            $folder = new Folder($this, $folder_name, $item["delimiter"], $item["flags"]);
 
-                if ($hierarchical && $folder->hasChildren()) {
-                    $pattern = $folder->full_name.$folder->delimiter.'%';
+            if ($hierarchical && $folder->hasChildren()) {
+                $pattern = $folder->full_name.$folder->delimiter.'%';
 
-                    $children = $this->getFoldersWithStatus(true, $pattern);
-                    $folder->setChildren($children);
-                }
-
-                $folder->loadStatus();
-                $folders->push($folder);
+                $children = $this->getFoldersWithStatus(true, $pattern);
+                $folder->setChildren($children);
             }
 
-            return $folders;
-        } else {
-            throw new FolderFetchingException("failed to fetch any folders");
+            $folder->loadStatus();
+            $folders->push($folder);
         }
+
+        return $folders;
     }
 
     /**
@@ -570,7 +529,7 @@ class Client
      */
     public function openFolder(string $folder_path, bool $force_select = false)
     {
-        if ($this->active_folder == $folder_path && $this->isConnected() && $force_select === false) {
+        if ($force_select === false && $this->active_folder === $folder_path && $this->isConnected()) {
             return true;
         }
         $this->checkConnection();
@@ -696,10 +655,10 @@ class Client
      * Set the connection timeout
      * @param integer $timeout
      *
-     * @return Protocol
+     * @return AbstractProtocol
      * @throws ConnectionFailedException
      */
-    public function setTimeout(int $timeout): Protocol
+    public function setTimeout(int $timeout): AbstractProtocol
     {
         $this->timeout = $timeout;
         if ($this->isConnected()) {

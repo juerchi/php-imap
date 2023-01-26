@@ -12,6 +12,8 @@
 
 namespace Webklex\PHPIMAP;
 
+use Psr\Log\LoggerInterface;
+
 /**
  * Class ClientManager
  *
@@ -24,34 +26,24 @@ class ClientManager
 
     /**
      * All library config
-     *
-     * @var array $config
      */
-    public static $config = [];
+    public static array $config = [];
 
-    /**
-     * @var array $accounts
-     */
-    protected $accounts = [];
+    protected array $accounts = [];
 
-    /**
-     * ClientManager constructor.
-     * @param array|string $config
-     */
-    public function __construct($config = [])
+    protected ?LoggerInterface $logger = null;
+
+    public function __construct(array|string $config = [])
     {
         $this->setConfig($config);
     }
 
     /**
      * Dynamically pass calls to the default account.
-     * @param string $method
-     * @param array $parameters
      *
-     * @return mixed
      * @throws Exceptions\MaskNotFoundException
      */
-    public function __call(string $method, array $parameters)
+    public function __call(string $method, array $parameters): mixed
     {
         $callable = [$this->account(), $method];
 
@@ -67,7 +59,10 @@ class ClientManager
      */
     public function make(array $config): Client
     {
-        return new Client($config);
+        $client = new Client($config);
+        $client->setLogger($this->logger);
+
+        return $client;
     }
 
     /**
@@ -132,16 +127,16 @@ class ClientManager
     {
         $config = $this->getClientConfig($name);
 
-        return new Client($config);
+        $client = new Client($config);
+        $client->setLogger($this->logger);
+
+        return $client;
     }
 
     /**
      * Get the account configuration.
-     * @param string|null $name
-     *
-     * @return array
      */
-    protected function getClientConfig($name): array
+    protected function getClientConfig(?string $name): array
     {
         if ($name === null || $name === 'null') {
             return ['driver' => 'null'];
@@ -152,8 +147,6 @@ class ClientManager
 
     /**
      * Get the name of the default account.
-     *
-     * @return string
      */
     public function getDefaultAccount(): string
     {
@@ -162,11 +155,8 @@ class ClientManager
 
     /**
      * Set the name of the default account.
-     * @param string $name
-     *
-     * @return void
      */
-    public function setDefaultAccount(string $name)
+    public function setDefaultAccount(string $name): void
     {
         self::$config['default'] = $name;
     }
@@ -179,11 +169,9 @@ class ClientManager
      * If however the default account is missing a parameter the package default account parameter will be used.
      * This can be disabled by setting imap.default in your config file to 'false'
      *
-     * @param array|string $config
-     *
      * @return $this
      */
-    public function setConfig($config): ClientManager
+    public function setConfig(array|string $config): ClientManager
     {
 
         if (is_array($config) === false) {
@@ -234,19 +222,13 @@ class ClientManager
      * @link   http://www.php.net/manual/en/function.array-merge-recursive.php#96201
      * @author Mark Roduner <mark.roduner@gmail.com>
      */
-    private function array_merge_recursive_distinct()
+    private function array_merge_recursive_distinct(): mixed
     {
-
         $arrays = func_get_args();
         $base = array_shift($arrays);
 
-        // From https://stackoverflow.com/a/173479
-        $isAssoc = function (array $arr) {
-            if (array() === $arr) {
-                return false;
-            }
-
-            return array_keys($arr) !== range(0, count($arr) - 1);
+        $isAssoc = static function (array $arr) {
+            return [] !== $arr && !array_is_list($arr);
         };
 
         if (!is_array($base)) {
@@ -261,20 +243,14 @@ class ClientManager
 
             foreach ($append as $key => $value) {
 
-                if (!array_key_exists($key, $base) and !is_numeric($key)) {
+                if (!array_key_exists($key, $base) && !is_numeric($key)) {
                     $base[$key] = $value;
                     continue;
                 }
 
                 if (
-                    (
-                        is_array($value)
-                        && $isAssoc($value)
-                    )
-                    || (
-                        is_array($base[$key])
-                        && $isAssoc($base[$key])
-                    )
+                    (is_array($value) && $isAssoc($value))
+                    || (is_array($base[$key]) && $isAssoc($base[$key]))
                 ) {
                     // If the arrays are not associates we don't want to array_merge_recursive_distinct
                     // else merging $baseConfig['dispositions'] = ['attachment', 'inline'] with $customConfig['dispositions'] = ['attachment']
@@ -282,7 +258,7 @@ class ClientManager
                     $base[$key] = $this->array_merge_recursive_distinct($base[$key], $value);
                 } else {
                     if (is_numeric($key)) {
-                        if (!in_array($value, $base)) {
+                        if (!in_array($value, $base, true)) {
                             $base[] = $value;
                         }
                     } else {

@@ -12,6 +12,7 @@
 
 namespace Webklex\PHPIMAP\Connection\Protocols;
 
+use Psr\Log\LoggerInterface;
 use Webklex\PHPIMAP\Exceptions\ConnectionFailedException;
 use Webklex\PHPIMAP\IMAP;
 
@@ -20,7 +21,8 @@ use Webklex\PHPIMAP\IMAP;
  *
  * @package Webklex\PHPIMAP\Connection\Protocols
  */
-abstract class Protocol implements ProtocolInterface {
+abstract class AbstractProtocol implements ProtocolInterface
+{
 
     /**
      * Default connection timeout in seconds
@@ -67,17 +69,21 @@ abstract class Protocol implements ProtocolInterface {
 
     /**
      * Cache for uid of active folder.
-     *
-     * @var null|array
      */
-    protected $uid_cache = null;
+    protected ?array $uid_cache = null;
+
+    protected ?LoggerInterface $logger = null;
+
+    public function setLogger(?LoggerInterface $logger): void
+    {
+        $this->logger = $logger;
+    }
 
     /**
      * Get an available cryptographic method
-     *
-     * @return int
      */
-    public function getCryptoMethod() {
+    public function getCryptoMethod(): int
+    {
         // Allow the best TLS version(s) we can
         $cryptoMethod = STREAM_CRYPTO_METHOD_TLS_CLIENT;
 
@@ -85,7 +91,7 @@ abstract class Protocol implements ProtocolInterface {
         // so add them back in manually if we can
         if (defined('STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT')) {
             $cryptoMethod = STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT;
-        }elseif (defined('STREAM_CRYPTO_METHOD_TLSv1_1_CLIENT')) {
+        } elseif (defined('STREAM_CRYPTO_METHOD_TLSv1_1_CLIENT')) {
             $cryptoMethod = STREAM_CRYPTO_METHOD_TLSv1_1_CLIENT;
         }
 
@@ -97,8 +103,10 @@ abstract class Protocol implements ProtocolInterface {
      *
      * @return $this
      */
-    public function enableCertValidation() {
+    public function enableCertValidation()
+    {
         $this->cert_validation = true;
+
         return $this;
     }
 
@@ -106,19 +114,23 @@ abstract class Protocol implements ProtocolInterface {
      * Disable SSL certificate validation
      * @return $this
      */
-    public function disableCertValidation() {
+    public function disableCertValidation()
+    {
         $this->cert_validation = false;
+
         return $this;
     }
 
     /**
      * Set SSL certificate validation
+     * @return $this
      * @var int $cert_validation
      *
-     * @return $this
      */
-    public function setCertValidation($cert_validation) {
+    public function setCertValidation($cert_validation)
+    {
         $this->cert_validation = $cert_validation;
+
         return $this;
     }
 
@@ -127,17 +139,19 @@ abstract class Protocol implements ProtocolInterface {
      *
      * @return bool
      */
-    public function getCertValidation() {
+    public function getCertValidation()
+    {
         return $this->cert_validation;
     }
 
     /**
      * Set connection proxy settings
+     * @return $this
      * @var array $options
      *
-     * @return $this
      */
-    public function setProxy($options) {
+    public function setProxy($options)
+    {
         foreach ($this->proxy as $key => $val) {
             if (isset($options[$key])) {
                 $this->proxy[$key] = $options[$key];
@@ -152,22 +166,24 @@ abstract class Protocol implements ProtocolInterface {
      *
      * @return array
      */
-    public function getProxy() {
+    public function getProxy()
+    {
         return $this->proxy;
     }
 
     /**
      * Prepare socket options
+     * @return array
      * @var string $transport
      *
-     * @return array
      */
-    private function defaultSocketOptions($transport) {
+    private function defaultSocketOptions($transport)
+    {
         $options = [];
         if ($this->encryption != false) {
             $options["ssl"] = [
                 'verify_peer_name' => $this->getCertValidation(),
-                'verify_peer'      => $this->getCertValidation(),
+                'verify_peer' => $this->getCertValidation(),
             ];
         }
 
@@ -179,7 +195,7 @@ abstract class Protocol implements ProtocolInterface {
                 $auth = base64_encode($this->proxy["username"].':'.$this->proxy["password"]);
 
                 $options[$transport]["header"] = [
-                    "Proxy-Authorization: Basic $auth"
+                    "Proxy-Authorization: Basic $auth",
                 ];
             }
         }
@@ -197,9 +213,14 @@ abstract class Protocol implements ProtocolInterface {
      * @return resource|boolean The socket created.
      * @throws ConnectionFailedException
      */
-    protected function createStream($transport, $host, $port, $timeout) {
+    protected function createStream($transport, $host, $port, $timeout)
+    {
         $socket = "$transport://$host:$port";
-        $stream = stream_socket_client($socket, $errno, $errstr, $timeout,
+        $stream = stream_socket_client(
+            $socket,
+            $errno,
+            $errstr,
+            $timeout,
             STREAM_CLIENT_CONNECT,
             stream_context_create($this->defaultSocketOptions($transport))
         );
@@ -218,18 +239,21 @@ abstract class Protocol implements ProtocolInterface {
     /**
      * @return int
      */
-    public function getConnectionTimeout() {
+    public function getConnectionTimeout()
+    {
         return $this->connection_timeout;
     }
 
     /**
      * @param int $connection_timeout
-     * @return Protocol
+     * @return AbstractProtocol
      */
-    public function setConnectionTimeout($connection_timeout) {
+    public function setConnectionTimeout($connection_timeout)
+    {
         if ($connection_timeout !== null) {
             $this->connection_timeout = $connection_timeout;
         }
+
         return $this;
     }
 
@@ -239,7 +263,8 @@ abstract class Protocol implements ProtocolInterface {
      *
      * @return string
      */
-    public function getUIDKey($uid) {
+    public function getUIDKey($uid)
+    {
         if ($uid == IMAP::ST_UID || $uid == IMAP::FT_UID) {
             return "UID";
         }
@@ -250,7 +275,8 @@ abstract class Protocol implements ProtocolInterface {
         return "";
     }
 
-    public function buildUIDCommand($command, $uid) {
+    public function buildUIDCommand($command, $uid)
+    {
         return trim($this->getUIDKey($uid)." ".$command);
     }
 
@@ -259,9 +285,11 @@ abstract class Protocol implements ProtocolInterface {
      *
      * @param array|null $uids
      */
-    public function setUidCache($uids) {
+    public function setUidCache($uids)
+    {
         if (is_null($uids)) {
             $this->uid_cache = null;
+
             return;
         }
 
@@ -275,11 +303,13 @@ abstract class Protocol implements ProtocolInterface {
         $this->uid_cache = $uid_cache;
     }
 
-    public function enableUidCache() {
+    public function enableUidCache()
+    {
         $this->enable_uid_cache = true;
     }
 
-    public function disableUidCache() {
+    public function disableUidCache()
+    {
         $this->enable_uid_cache = false;
     }
 }

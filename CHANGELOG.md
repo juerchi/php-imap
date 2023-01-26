@@ -124,7 +124,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - [Query::class](src/Query/Query.php)
 - [Client::class](src/Client.php)
 - [Header::class](src/Header.php)
-- [Protocol::class](src/Connection/Protocols/Protocol.php)
+- [Protocol::class](src/Connection/Protocols/AbstractProtocol.php)
 - [ClientManager::class](src/ClientManager.php)
 
 ### Breaking changes
@@ -145,7 +145,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ### Affected Classes
 - [Header::class](src/Header.php)
-- [Protocol::class](src/Connection/Protocols/Protocol.php)
+- [Protocol::class](src/Connection/Protocols/AbstractProtocol.php)
 - [Query::class](src/Query/Query.php)
 - [Part::class](src/Part.php)
 - [ClientManager::class](src/ClientManager.php)
@@ -169,7 +169,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ### Affected Classes
 - [Header::class](src/Header.php)
-- [Protocol::class](src/Connection/Protocols/Protocol.php)
+- [Protocol::class](src/Connection/Protocols/AbstractProtocol.php)
 - [Query::class](src/Query/Query.php)
 - [WhereQuery::class](src/Query/WhereQuery.php)
 - [Message::class](src/Message.php)

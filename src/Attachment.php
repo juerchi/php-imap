@@ -59,20 +59,16 @@ class Attachment
 
     /**
      * Used config
-     *
-     * @var array $config
      */
-    protected $config = [];
+    protected array $config = [];
 
     /** @var Part $part */
     protected $part;
 
     /**
      * Attribute holder
-     *
-     * @var array $attributes
      */
-    protected $attributes = [
+    protected array $attributes = [
         'content' => null,
         'type' => null,
         'part_number' => 0,
@@ -86,10 +82,8 @@ class Attachment
 
     /**
      * Default mask
-     *
-     * @var string $mask
      */
-    protected $mask = AttachmentMask::class;
+    protected string $mask = AttachmentMask::class;
 
     /**
      * Attachment constructor.

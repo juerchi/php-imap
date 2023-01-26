@@ -23,7 +23,7 @@ use Webklex\PHPIMAP\IMAP;
  *
  * @package Webklex\PHPIMAP\Connection\Protocols
  */
-class LegacyProtocol extends Protocol {
+class LegacyProtocol extends AbstractProtocol {
 
     protected $protocol = "imap";
     protected $host = null;
@@ -161,7 +161,7 @@ class LegacyProtocol extends Protocol {
      * @return bool
      */
     public function connected(): bool {
-        return boolval($this->stream);
+        return (bool) $this->stream;
     }
 
     /**
