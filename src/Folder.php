@@ -34,57 +34,55 @@ class Folder
      *
      * @var Client
      */
-    protected $client;
+    protected Client $client;
 
     /**
      * Folder full path
      *
      * @var string
      */
-    public $path;
+    public string $path;
 
     /**
      * Folder name
      *
      * @var string
      */
-    public $name;
+    public string $name;
 
     /**
      * Folder fullname
      *
      * @var string
      */
-    public $full_name;
+    public string $full_name;
 
     /**
      * Children folders
-     *
-     * @var FolderCollection|array
      */
-    public $children = [];
+    public FolderCollection $children;
 
     /**
      * Delimiter for folder
      *
      * @var string
      */
-    public $delimiter;
+    public string $delimiter;
 
     /**
-     * Indicates if folder can't containg any "children".
+     * Indicates if folder can't contain any "children".
      * CreateFolder won't work on this folder.
      *
      * @var boolean
      */
-    public $no_inferiors;
+    public bool $no_inferiors;
 
     /**
      * Indicates if folder is only container, not a mailbox - you can't open it.
      *
      * @var boolean
      */
-    public $no_select;
+    public bool $no_select;
 
     /**
      * Indicates if folder is marked. This means that it may contain new messages since the last time it was checked.
@@ -92,35 +90,31 @@ class Folder
      *
      * @var boolean
      */
-    public $marked;
+    public bool $marked;
 
     /**
-     * Indicates if folder containg any "children".
+     * Indicates if folder contains any "children".
      * Not provided by all IMAP servers.
      *
      * @var boolean
      */
-    public $has_children;
+    public bool $has_children;
 
     /**
-     * Indicates if folder refers to other.
+     * Indicates if folder refers to others.
      * Not provided by all IMAP servers.
      *
      * @var boolean
      */
-    public $referral;
+    public bool $referral;
 
     /** @var array */
-    public $status;
+    public array $status;
 
     /**
-     * Folder constructor.
-     * @param Client $client
-     * @param string $folder_name
-     * @param string $delimiter
      * @param string[] $attributes
      */
-    public function __construct(Client $client, string $folder_name, string $delimiter, array $attributes)
+    public function __construct(Client $client, string $folderPath, string $delimiter, array $attributes)
     {
         $this->client = $client;
 
@@ -128,8 +122,8 @@ class Folder
         $this->events["folder"] = $client->getDefaultEvents("folder");
 
         $this->setDelimiter($delimiter);
-        $this->path = $folder_name;
-        $this->full_name = $this->decodeName($folder_name);
+        $this->path = $folderPath;
+        $this->full_name = $this->decodeName($folderPath);
         $this->name = $this->getSimpleName($this->delimiter, $this->full_name);
 
         $this->parseAttributes($attributes);
@@ -190,12 +184,11 @@ class Folder
 
     /**
      * Set children.
-     * @param FolderCollection|array $children
+     * @param FolderCollection $children
      *
      * @return self
      */
-    public function setChildren($children = []): Folder
-    {
+    public function setChildren(FolderCollection $children): Folder {
         $this->children = $children;
 
         return $this;
@@ -204,23 +197,18 @@ class Folder
     /**
      * Decode name.
      * It converts UTF7-IMAP encoding to UTF-8.
-     * @param $name
      *
      * @return array|false|string|string[]|null
      */
-    protected function decodeName($name)
+    protected function decodeName(string $name)
     {
         return mb_convert_encoding($name, "UTF-8", "UTF7-IMAP");
     }
 
     /**
      * Get simple name (without parent folders).
-     * @param $delimiter
-     * @param $full_name
-     *
-     * @return mixed
      */
-    protected function getSimpleName($delimiter, $full_name)
+    protected function getSimpleName(string $delimiter, string $full_name): string|bool
     {
         $arr = explode($delimiter, $full_name);
 
@@ -395,7 +383,7 @@ class Folder
     public function idle(callable $callback, int $timeout = 300, bool $auto_reconnect = false)
     {
         $this->client->setTimeout($timeout);
-        if (!in_array("IDLE", $this->client->getConnection()->getCapabilities())) {
+        if (!in_array('IDLE', $this->client->getConnection()->getCapabilities(), true)) {
             throw new NotSupportedCapabilityException("IMAP server does not support IDLE");
         }
         $this->client->openFolder($this->path, true);

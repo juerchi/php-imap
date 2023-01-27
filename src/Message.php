@@ -35,18 +35,18 @@ use Webklex\PHPIMAP\Traits\HasEvents;
  * @property integer msglist
  * @property integer uid
  * @property integer msgn
- * @property Attribute subject
- * @property Attribute message_id
- * @property Attribute message_no
- * @property Attribute references
- * @property Attribute date
- * @property Attribute from
- * @property Attribute to
- * @property Attribute cc
- * @property Attribute bcc
- * @property Attribute reply_to
- * @property Attribute in_reply_to
- * @property Attribute sender
+ * @property Attribute|null subject
+ * @property Attribute|null message_id
+ * @property Attribute|null message_no
+ * @property Attribute|null references
+ * @property Attribute|null date
+ * @property Attribute|null from
+ * @property Attribute|null to
+ * @property Attribute|null cc
+ * @property Attribute|null bcc
+ * @property Attribute|null reply_to
+ * @property Attribute|null in_reply_to
+ * @property Attribute|null sender
  *
  * @method integer getMsglist()
  * @method integer setMsglist($msglist)
@@ -942,11 +942,11 @@ class Message
 
             $this->client->openFolder($this->folder_path);
             if ($this->client->getConnection()->copyMessage(
-                    $folder->path,
-                    $this->getSequenceId(),
-                    null,
-                    $this->sequence === IMAP::ST_UID
-                ) == true) {
+                $folder->path,
+                $this->getSequenceId(),
+                null,
+                $this->sequence === IMAP::ST_UID
+            )) {
                 return $this->fetchNewMail($folder, $next_uid, "copied", $expunge);
             }
         }

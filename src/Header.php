@@ -30,21 +30,21 @@ class Header
      *
      * @var string $raw
      */
-    public $raw = "";
+    public string $raw = "";
 
     /**
      * Attribute holder
      *
      * @var Attribute[]|array $attributes
      */
-    protected $attributes = [];
+    protected array $attributes = [];
 
     /**
      * Config holder
      *
      * @var array $config
      */
-    protected $config = [];
+    protected array $config = [];
 
     /**
      * Fallback Encoding
@@ -208,7 +208,7 @@ class Header
      *
      * @throws InvalidMessageDateException
      */
-    protected function parse()
+    protected function parse(): void
     {
         $header = $this->rfc822_parse_headers($this->raw);
 
@@ -226,7 +226,7 @@ class Header
 
         $this->parseDate($header);
         foreach ($header as $key => $value) {
-            $key = trim(rtrim(strtolower($key)));
+            $key = strtolower(trim(rtrim($key)));
             if (!isset($this->attributes[$key])) {
                 $this->set($key, $value);
             }
@@ -669,7 +669,7 @@ class Header
                     }
                 }
 
-                if (strpos($address->personal, "'") === 0) {
+                if (str_starts_with($address->personal, "'")) {
                     $address->personal = str_replace("'", "", $address->personal);
                 }
             }
@@ -740,7 +740,7 @@ class Header
      *
      * @throws InvalidMessageDateException
      */
-    private function parseDate($header)
+    private function parseDate(object $header)
     {
 
         if (property_exists($header, 'date')) {
@@ -752,14 +752,14 @@ class Header
 
             $date = trim(rtrim($date));
             try {
-                if (strpos($date, '&nbsp;') !== false) {
+                if (str_contains($date, '&nbsp;')) {
                     $date = str_replace('&nbsp;', ' ', $date);
                 }
                 $parsed_date = Carbon::parse($date);
             } catch (\Exception $e) {
                 switch (true) {
                     case preg_match(
-                            '/([0-9]{4}\.[0-9]{1,2}\.[0-9]{1,2}\-[0-9]{1,2}\.[0-9]{1,2}.[0-9]{1,2})+$/i',
+                            '/([0-9]{4}\.[0-9]{1,2}\.[0-9]{1,2}\-[0-9]{1,2}\.[0-9]{1,2}.[0-9]{1,2})+$/',
                             $date
                         ) > 0:
                         $date = Carbon::createFromFormat("Y.m.d-H.i.s", $date);
@@ -806,16 +806,16 @@ class Header
                 }
                 try {
                     $parsed_date = Carbon::parse($date);
-                } catch (\Exception $_e) {
+                } catch (\Exception) {
                     if (!isset($this->config["fallback_date"])) {
                         throw new InvalidMessageDateException(
                             "Invalid message date. ID:".$this->get("message_id")." Date:".$header->date."/".$date,
                             1100,
                             $e
                         );
-                    } else {
-                        $parsed_date = Carbon::parse($this->config["fallback_date"]);
                     }
+
+                    $parsed_date = Carbon::parse($this->config["fallback_date"]);
                 }
             }
 

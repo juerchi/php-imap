@@ -31,9 +31,12 @@
         "psr/log": "^3.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "~4.0"
+        "phpunit/phpunit": "~4.0",
+        "rector/rector": "^0.15.10",
+        "phpstan/phpstan": "^1.9"
     },
     "suggest": {
+        "ext-imap": "Needed for the imap-legacy protocol",
         "symfony/mime": "Recomended for better extension support"
     },
     "autoload": {
