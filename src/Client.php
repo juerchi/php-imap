@@ -433,7 +433,7 @@ class Client
      */
     public function getFolderByName($folder_name): ?Folder
     {
-        return $this->getFolders(false)->where("name", $folder_name)->first();
+        return $this->getFolders(false)->where('name', $folder_name)->first();
     }
 
     /**
@@ -446,7 +446,7 @@ class Client
      */
     public function getFolderByPath($folder_path): ?Folder
     {
-        return $this->getFolders(false)->where("path", $folder_path)->first();
+        return $this->getFolders(false)->where('path', $folder_path)->first();
     }
 
     /**

@@ -109,24 +109,19 @@ class ImapProtocol extends AbstractProtocol
      */
     public function nextLine(): string
     {
-        $line = '';
-        while (($next_char = fread($this->stream, 1)) !== false
-            && $next_char !== "\n" && $next_char !== ''
-        ) {
-            $line .= $next_char;
-        }
-        if ($line === '' && $next_char === false) {
+        $line = fgets($this->stream);
+        if (false === $line) {
             throw new RuntimeException('empty response');
         }
         if ($this->debug) {
             if (null !== $this->logger) {
                 $this->logger->debug('IMAP: << '.$line);
             } else {
-                echo "<< ".$line."\n";
+                echo "<< ".$line;
             }
         }
 
-        return $line."\n";
+        return $line;
     }
 
     /**
@@ -172,11 +167,12 @@ class ImapProtocol extends AbstractProtocol
     /**
      * Split a given line in values. A value is literal of any form or a list
      * @param string $line
+     * @param resource|null $stream
      *
      * @return array
      * @throws RuntimeException
      */
-    protected function decodeLine(string $line): array
+    protected function decodeLine(string $line, $stream = null): array
     {
         $tokens = [];
         $stack = [];
@@ -205,19 +201,34 @@ class ImapProtocol extends AbstractProtocol
                 $endPos = strpos($token, '}');
                 $chars = substr($token, 1, $endPos - 1);
                 if (is_numeric($chars)) {
-                    $token = '';
-                    while (strlen($token) < $chars) {
-                        $token .= $this->nextLine();
-                    }
-                    $line = '';
-                    if (strlen($token) > $chars) {
-                        $line = substr($token, $chars);
-                        $token = substr($token, 0, $chars);
-                    } else {
-                        $line .= $this->nextLine();
-                    }
+                    $charsToRead = (int) $chars;
+                    $token = (null === $stream) ? '' : 'STREAM CONTENT';
+                    do {
+                        $chunk = fread($this->stream, $charsToRead > 2048 ? 2048 : $charsToRead);
+                        if (null === $stream) {
+                            $token .= $chunk;
+                        }
+                        if (false === $chunk) {
+                            throw new RuntimeException('empty response.');
+                        }
+                        $chunkSize = strlen($chunk);
+                        if ($this->logger !== null && $chunkSize > 0) {
+                            $this->logger->debug('>> {chunkSize} bytes read', ['chunkSize' => $chunkSize]);
+                        }
+                        $charsToRead -= $chunkSize;
+                        if (is_resource($stream)) {
+                            // store chunk to other file
+                            $charsWritten = fwrite($stream, $chunk, $chunkSize);
+                            if ($charsWritten !== $chunkSize) {
+                                throw new RuntimeException('error writing to email file.');
+                            }
+                        }
+                    } while ($charsToRead > 0);
+
+                    $line = $this->nextLine();
                     $tokens[] = $token;
                     $line = trim($line).' ';
+
                     continue;
                 }
             }
@@ -233,7 +244,7 @@ class ImapProtocol extends AbstractProtocol
                 }
                 $token = $tokens;
                 $tokens = array_pop($stack);
-                // special handline if more than one closing brace
+                // special handling if more than one closing brace
                 while ($braces-- > 0) {
                     $tokens[] = $token;
                     $token = $tokens;
@@ -259,14 +270,15 @@ class ImapProtocol extends AbstractProtocol
      * @param array|string $tokens to decode
      * @param string $wantedTag targeted tag
      * @param bool $dontParse if true only the unparsed line is returned in $tokens
+     * @param resource|null $stream
      *
      * @return bool
      * @throws RuntimeException
      */
-    public function readLine(&$tokens = [], string $wantedTag = '*', bool $dontParse = false): bool
+    public function readLine(&$tokens = [], string $wantedTag = '*', bool $dontParse = false, $stream = null): bool
     {
         $line = $this->nextTaggedLine($tag); // get next tag
-        $tokens = $dontParse ? $line : $this->decodeLine($line);
+        $tokens = $dontParse ? $line : $this->decodeLine($line, $stream);
 
         // if tag is wanted tag we might be at the end of a multiline response
         return $tag == $wantedTag;
@@ -626,9 +638,9 @@ class ImapProtocol extends AbstractProtocol
         $items = (array)$items;
         $itemList = $this->escapeList($items);
 
-        $this->sendRequest($this->buildUIDCommand("FETCH", $uid), [$set, $itemList], $tag);
+        $this->sendRequest($this->buildUIDCommand('FETCH', $uid), [$set, $itemList], $tag);
         $result = [];
-        $tokens = null; // define $tokens variable before first use
+        $tokens = []; // define $tokens variable before first use
         while (!$this->readLine($tokens, $tag)) {
             // ignore other responses
             if ($tokens[1] !== 'FETCH') {
@@ -664,17 +676,16 @@ class ImapProtocol extends AbstractProtocol
                 } elseif ($uid && $tokens[2][2] == $items[0]) {
                     $data = $tokens[2][3];
                 } else {
-                    $expectedResponse = 0;
+                    $expectedResponse = false;
                     // maybe the server send an other field we didn't wanted
                     $count = count($tokens[2]);
                     // we start with 2, because 0 was already checked
                     for ($i = 2; $i < $count; $i += 2) {
-                        if ($tokens[2][$i] != $items[0]) {
-                            continue;
+                        if ($tokens[2][$i] == $items[0]) {
+                            $data = $tokens[2][$i + 1];
+                            $expectedResponse = true;
+                            break;
                         }
-                        $data = $tokens[2][$i + 1];
-                        $expectedResponse = 1;
-                        break;
                     }
                     if (!$expectedResponse) {
                         continue;
@@ -688,13 +699,6 @@ class ImapProtocol extends AbstractProtocol
                 }
             }
 
-            // if we want only one message we can ignore everything else and just return
-            if ($to === null && !is_array($from) && ($uid ? $tokens[2][$uidKey] == $from : $tokens[0] == $from)) {
-                // we still need to read all lines
-                while (!$this->readLine($tokens, $tag)) {
-                    return $data;
-                }
-            }
             if ($uid) {
                 $result[$tokens[2][$uidKey]] = $data;
             } else {
@@ -702,15 +706,76 @@ class ImapProtocol extends AbstractProtocol
             }
         }
 
-        if ($to === null && !is_array($from)) {
-            throw new RuntimeException('the single id was not found in response');
-        }
-
         return $result;
     }
 
+    public function saveMessage(int $msgUid, $stream): void
+    {
+        $this->fetchOneByUid('RFC822.HEADER', $msgUid, $stream);
+        fwrite($stream, "\r\n\r\n");
+        $this->fetchOneByUid('RFC822.TEXT', $msgUid, $stream);
+    }
+
+    protected function fetchOneByUid(string $item, int $msgUid, $stream = null): string
+    {
+        $itemList = $this->escapeList([$item]);
+        $tag = '';
+        $this->sendRequest($this->buildUIDCommand('FETCH', IMAP::ST_UID), [$msgUid, $itemList], $tag);
+        $data = '';
+        $tokens = []; // define $tokens variable before first use
+        while (!$this->readLine($tokens, $tag, false, $stream)) {
+            // ignore other responses
+            if ($tokens[1] !== 'FETCH') {
+                continue;
+            }
+
+            // find array key of UID value; try the last elements, or search for it
+            $count = count($tokens[2]);
+            if ($tokens[2][$count - 2] === 'UID') {
+                $uidKey = $count - 1;
+            } elseif ($tokens[2][0] === 'UID') {
+                $uidKey = 1;
+            } else {
+                $found = array_search('UID', $tokens[2], true);
+                if ($found === false || $found === -1) {
+                    continue;
+                }
+
+                $uidKey = $found + 1;
+            }
+
+            // ignore other messages
+            if ($tokens[2][$uidKey] != $msgUid) {
+                continue;
+            }
+
+            if ($tokens[2][0] == $item) {
+                $data = $tokens[2][1];
+            } elseif ($tokens[2][2] == $item) {
+                $data = $tokens[2][3];
+            } else {
+                $expectedResponse = false;
+                // maybe the server send an other field we didn't wanted
+                $count = count($tokens[2]);
+                // we start with 2, because 0 was already checked
+                for ($i = 2; $i < $count; $i += 2) {
+                    if ($tokens[2][$i] === $item) {
+                        $data = $tokens[2][$i + 1];
+                        $expectedResponse = true;
+                        break;
+                    }
+                }
+                if (!$expectedResponse) {
+                    continue;
+                }
+            }
+        }
+
+        return $data;
+    }
+
     /**
-     * Fetch message headers
+     * Fetch message content
      * @param array|int $uids
      * @param string $rfc
      * @param int|string $uid set to IMAP::ST_UID or any string representing the UID - set to IMAP::ST_MSGN to use
@@ -721,7 +786,7 @@ class ImapProtocol extends AbstractProtocol
      */
     public function content($uids, string $rfc = "RFC822", $uid = IMAP::ST_UID): array
     {
-        $result = $this->fetch(["$rfc.TEXT"], $uids, null, $uid);
+        $result = $this->fetch([$rfc.'.TEXT'], $uids, null, $uid);
 
         return is_array($result) ? $result : [];
     }
@@ -733,12 +798,12 @@ class ImapProtocol extends AbstractProtocol
      * @param int|string $uid set to IMAP::ST_UID or any string representing the UID - set to IMAP::ST_MSGN to use
      * message numbers instead.
      *
-     * @return array
+     * @return array|string
      * @throws RuntimeException
      */
-    public function headers($uids, string $rfc = "RFC822", $uid = IMAP::ST_UID): array
+    public function headers($uids, string $rfc = 'RFC822', $uid = IMAP::ST_UID): array
     {
-        $result = $this->fetch(["$rfc.HEADER"], $uids, null, $uid);
+        $result = $this->fetch([$rfc.'.HEADER'], $uids, null, $uid);
 
         return $result === '' ? [] : $result;
     }
@@ -754,7 +819,7 @@ class ImapProtocol extends AbstractProtocol
      */
     public function flags($uids, $uid = IMAP::ST_UID): array
     {
-        $result = $this->fetch(["FLAGS"], $uids, null, $uid);
+        $result = $this->fetch(['FLAGS'], $uids, null, $uid);
 
         return is_array($result) ? $result : [];
     }
@@ -971,7 +1036,7 @@ class ImapProtocol extends AbstractProtocol
     public function moveMessage(string $folder, $from, $to = null, $uid = IMAP::ST_UID): bool
     {
         $set = $this->buildSet($from, $to);
-        $command = $this->buildUIDCommand("MOVE", $uid);
+        $command = $this->buildUIDCommand('MOVE', $uid);
 
         return (bool)$this->requestAndResponse($command, [$set, $this->escapeString($folder)], true);
     }

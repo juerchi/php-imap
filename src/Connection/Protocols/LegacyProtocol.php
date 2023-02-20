@@ -296,6 +296,11 @@ class LegacyProtocol extends AbstractProtocol
         return $result;
     }
 
+    public function saveMessage(int $msgUid, $stream): void
+    {
+        \imap_savebody($this->stream, $stream, $msgUid, '', IMAP::ST_UID);
+    }
+
     /**
      * Get uid for a given id
      * @param int|null $id message number

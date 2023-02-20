@@ -138,6 +138,13 @@ interface ProtocolInterface {
     public function flags($uids, $uid = IMAP::ST_UID): array;
 
     /**
+     * Write a specific message to a stream (headers + body)
+     * @param int $msgUid
+     * @param resource $stream
+     */
+    public function saveMessage(int $msgUid, $stream): void;
+
+    /**
      * Get uid for a given id
      * @param int|null $id message number
      *

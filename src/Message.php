@@ -221,11 +221,11 @@ class Message
 
         $this->parseHeader();
 
-        if ($this->getFetchBodyOption() === true) {
+        if ($this->getFetchBodyOption()) {
             $this->parseBody();
         }
 
-        if ($this->getFetchFlagsOption() === true && $this->fetch_options !== IMAP::FT_PEEK) {
+        if ($this->getFetchFlagsOption() && $this->fetch_options !== IMAP::FT_PEEK) {
             $this->parseFlags();
         }
     }
@@ -970,7 +970,7 @@ class Message
      * @throws MessageFlagException
      * @throws Exceptions\MessageNotFoundException
      */
-    public function move(string $folder_path, bool $expunge = false)
+    public function move(string $folder_path, bool $expunge = false): ?Message
     {
         $this->client->openFolder($folder_path);
         $status = $this->client->getConnection()->examineFolder($folder_path);

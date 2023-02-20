@@ -118,8 +118,8 @@ class Folder
     {
         $this->client = $client;
 
-        $this->events["message"] = $client->getDefaultEvents("message");
-        $this->events["folder"] = $client->getDefaultEvents("folder");
+        $this->events['message'] = $client->getDefaultEvents('message');
+        $this->events['folder'] = $client->getDefaultEvents('folder');
 
         $this->setDelimiter($delimiter);
         $this->path = $folderPath;
@@ -202,7 +202,7 @@ class Folder
      */
     protected function decodeName(string $name)
     {
-        return mb_convert_encoding($name, "UTF-8", "UTF7-IMAP");
+        return mb_convert_encoding($name, 'UTF-8', 'UTF7-IMAP');
     }
 
     /**
@@ -248,7 +248,7 @@ class Folder
         }
 
         $folder = $this->client->getFolder($new_name);
-        $event = $this->getEvent("folder", "moved");
+        $event = $this->getEvent('folder', 'moved');
         $event::dispatch($this, $folder);
 
         return $status;
@@ -267,7 +267,7 @@ class Folder
     public function overview(string $sequence = null): array
     {
         $this->client->openFolder($this->path);
-        $sequence = $sequence === null ? "1:*" : $sequence;
+        $sequence ??= '1:*';
         $uid = ClientManager::get('options.sequence', IMAP::ST_MSGN) == IMAP::ST_UID;
 
         return $this->client->getConnection()->overview($sequence, $uid);
@@ -296,6 +296,16 @@ class Folder
         }
 
         return $this->client->getConnection()->appendMessage($this->path, $message, $options, $internal_date);
+    }
+
+    public function saveMessage(int $uuid, string $filename = 'email.eml'): void
+    {
+        $stream = fopen($filename, 'wb');
+        if (false === $stream) {
+            throw new RuntimeException('cannot write email stream.');
+        }
+        $this->client->getConnection()->saveMessage($uuid, $stream);
+        fclose($stream);
     }
 
     /**
@@ -330,7 +340,7 @@ class Folder
             $this->client->expunge();
         }
 
-        $event = $this->getEvent("folder", "deleted");
+        $event = $this->getEvent('folder', 'deleted');
         $event::dispatch($this);
 
         return $status;
@@ -384,7 +394,7 @@ class Folder
     {
         $this->client->setTimeout($timeout);
         if (!in_array('IDLE', $this->client->getConnection()->getCapabilities(), true)) {
-            throw new NotSupportedCapabilityException("IMAP server does not support IDLE");
+            throw new NotSupportedCapabilityException('IMAP server does not support IDLE');
         }
         $this->client->openFolder($this->path, true);
         $connection = $this->client->getConnection();
@@ -397,7 +407,7 @@ class Folder
                 // This polymorphic call is fine - Protocol::idle() will throw an exception beforehand
                 $line = $connection->nextLine();
 
-                if (($pos = strpos($line, "EXISTS")) !== false) {
+                if (($pos = strpos($line, 'EXISTS')) !== false) {
                     $connection->done();
                     $msgn = (int)substr($line, 2, $pos - 2);
 
@@ -406,20 +416,20 @@ class Folder
                     $message->setSequence($sequence);
                     $callback($message);
 
-                    $event = $this->getEvent("message", "new");
+                    $event = $this->getEvent('message', 'new');
                     $event::dispatch($message);
                     $connection->idle();
-                } elseif (strpos($line, "OK") === false) {
+                } elseif (!str_contains($line, 'OK')) {
                     $connection->done();
                     $connection->idle();
                 }
             } catch (Exceptions\RuntimeException $e) {
-                if (strpos($e->getMessage(), "empty response") >= 0 && $connection->connected()) {
+                if (strpos($e->getMessage(), 'empty response') >= 0 && $connection->connected()) {
                     $connection->done();
                     $connection->idle();
                     continue;
                 }
-                if (strpos($e->getMessage(), "connection closed") === false) {
+                if (!str_contains($e->getMessage(), 'connection closed')) {
                     throw $e;
                 }
 

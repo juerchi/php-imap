@@ -441,8 +441,9 @@ class Query {
      * @throws MessageFlagException
      * @throws MessageNotFoundException
      */
-    public function getMessage(int $uid, $msglist = null, $sequence = null): Message {
-        return new Message($uid, $msglist, $this->getClient(), $this->getFetchOptions(), $this->getFetchBody(), $this->getFetchFlags(), $sequence ? $sequence : $this->sequence);
+    public function getMessage(int $uid, $msglist = null, $sequence = null): Message
+    {
+        return new Message($uid, $msglist, $this->getClient(), $this->getFetchOptions(), $this->getFetchBody(), $this->getFetchFlags(), $sequence ?: $this->sequence);
     }
 
     /**
@@ -460,7 +461,8 @@ class Query {
      * @throws MessageFlagException
      * @throws MessageNotFoundException
      */
-    public function getMessageByMsgn($msgn, $msglist = null): Message {
+    public function getMessageByMsgn($msgn, $msglist = null): Message
+    {
         return $this->getMessage($msgn, $msglist, IMAP::ST_MSGN);
     }
 
