@@ -27,6 +27,7 @@
         "ext-fileinfo": "*",
         "nesbot/carbon": ">=1.0",
         "symfony/http-foundation": ">=6.1.0",
+        "symfony/mime": ">=6.1.0",
         "illuminate/pagination": ">=5.0.0",
         "psr/log": "^3.0"
     },
@@ -36,8 +37,7 @@
         "phpstan/phpstan": "^1.9"
     },
     "suggest": {
-        "ext-imap": "Needed for the imap-legacy protocol",
-        "symfony/mime": "Recomended for better extension support"
+        "ext-imap": "Needed for the imap-legacy protocol"
     },
     "autoload": {
         "psr-4": {
@@ -58,5 +58,10 @@
         }
     },
     "minimum-stability": "dev",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "config": {
+        "allow-plugins": {
+            "kylekatarnls/update-helper": true
+        }
+    }
 }

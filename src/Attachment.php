@@ -13,6 +13,7 @@
 namespace Webklex\PHPIMAP;
 
 use Illuminate\Support\Str;
+use Symfony\Component\Mime\MimeTypes;
 use Webklex\PHPIMAP\Exceptions\MaskNotFoundException;
 use Webklex\PHPIMAP\Exceptions\MethodNotFoundException;
 use Webklex\PHPIMAP\Support\Masks\AttachmentMask;
@@ -239,24 +240,9 @@ class Attachment
     }
 
     /**
-     * Save the attachment content to your filesystem
-     * @param string $path
-     * @param string|null $filename
-     *
-     * @return boolean
-     */
-    public function save(string $path, $filename = null): bool
-    {
-        $filename = $filename ?: $this->getName();
-
-        return file_put_contents($path.$filename, $this->getContent()) !== false;
-    }
-
-    /**
      * Set the attachment name and try to decode it
-     * @param $name
      */
-    public function setName($name)
+    public function setName(?string $name): void
     {
         $decoder = $this->config['decoder']['attachment'];
         if ($name !== null) {
@@ -280,26 +266,13 @@ class Attachment
 
     /**
      * Try to guess the attachment file extension
-     *
-     * @return string|null
      */
-    public function getExtension()
+    public function getExtension(): ?string
     {
-        $guesser = "\Symfony\Component\Mime\MimeTypes";
-        if (class_exists($guesser) !== false) {
-            /** @var Symfony\Component\Mime\MimeTypes $guesser */
-            $extensions = $guesser::getDefault()->getExtensions($this->getMimeType());
+        $extensions = MimeTypes::getDefault()
+            ->getExtensions($this->getMimeType());
 
-            return $extensions[0] ?? null;
-        }
-
-        $deprecated_guesser = "\Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser";
-        if (class_exists($deprecated_guesser) !== false) {
-            /** @var \Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser $deprecated_guesser */
-            return $deprecated_guesser::getInstance()->guess($this->getMimeType());
-        }
-
-        return null;
+        return $extensions[0] ?? null;
     }
 
     /**
