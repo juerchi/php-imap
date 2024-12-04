@@ -203,7 +203,7 @@ class ImapProtocol extends AbstractProtocol
                 if (is_numeric($chars)) {
                     $charsToRead = (int) $chars;
                     $token = (null === $stream) ? '' : 'STREAM CONTENT';
-                    do {
+                    while ($charsToRead > 0) {
                         $chunk = fread($this->stream, $charsToRead > 2048 ? 2048 : $charsToRead);
                         if (null === $stream) {
                             $token .= $chunk;
@@ -223,7 +223,7 @@ class ImapProtocol extends AbstractProtocol
                                 throw new RuntimeException('error writing to email file.');
                             }
                         }
-                    } while ($charsToRead > 0);
+                    }
 
                     $line = $this->nextLine();
                     $tokens[] = $token;
