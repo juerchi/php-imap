@@ -13,6 +13,7 @@
 namespace Webklex\PHPIMAP;
 
 use Carbon\Carbon;
+use Webklex\PHPIMAP\Connection\Protocols\AbstractProtocol;
 use Webklex\PHPIMAP\Exceptions\ConnectionFailedException;
 use Webklex\PHPIMAP\Exceptions\NotSupportedCapabilityException;
 use Webklex\PHPIMAP\Exceptions\RuntimeException;
@@ -398,6 +399,7 @@ class Folder
         }
         $this->client->openFolder($this->path, true);
         $connection = $this->client->getConnection();
+        assert($connection instanceof AbstractProtocol);
         $connection->idle();
 
         $sequence = ClientManager::get('options.sequence', IMAP::ST_MSGN);

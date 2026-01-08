@@ -137,14 +137,10 @@ class Header
             if ($this->attributize) {
                 $this->attributes[$name]->add($value, true);
             } else {
-                if (isset($this->attributes[$name])) {
-                    if (!is_array($this->attributes[$name])) {
-                        $this->attributes[$name] = [$this->attributes[$name], $value];
-                    } else {
-                        $this->attributes[$name][] = $value;
-                    }
+                if (!is_array($this->attributes[$name])) {
+                    $this->attributes[$name] = [$this->attributes[$name], $value];
                 } else {
-                    $this->attributes[$name] = $value;
+                    $this->attributes[$name][] = $value;
                 }
             }
         } elseif (!$this->attributize) {
@@ -441,13 +437,13 @@ class Header
      */
     public function getEncoding($structure): string
     {
-        if (property_exists($structure, 'parameters')) {
+        if (is_object($structure) && property_exists($structure, 'parameters')) {
             foreach ($structure->parameters as $parameter) {
                 if (strtolower($parameter->attribute) == "charset") {
                     return EncodingAliases::get($parameter->value, $this->fallback_encoding);
                 }
             }
-        } elseif (property_exists($structure, 'charset')) {
+        } elseif (is_object($structure) && property_exists($structure, 'charset')) {
             return EncodingAliases::get($structure->charset, $this->fallback_encoding);
         } elseif (is_string($structure) === true) {
             $result = mb_detect_encoding($structure);
