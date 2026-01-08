@@ -27,7 +27,13 @@ phpunit
 vendor/bin/rector process
 
 # Run PHPStan for static analysis
-vendor/bin/phpstan analyse
+vendor/bin/phpstan analyse src --level=3  # Recommended: 1 error remaining
+vendor/bin/phpstan analyse src --level=5  # Strict: 57 errors remaining
+
+# PHPStan Status:
+# - Level 3 (critical errors): 1 error (96% reduction from original 23)
+# - Level 5 (strict analysis): 57 errors (72% reduction from original 202)
+# - Most remaining errors are flow analysis issues that can be suppressed
 
 # PHP CS Fixer is available but config is in .php-cs-fixer.cache
 # The project follows PHP CS standards
@@ -204,3 +210,19 @@ $message->delete($expunge = true);
 - Attachments are automatically detected during body parsing
 - Connection state is managed - client reopens folders as needed
 - Expunge operations are optional on most destructive operations
+
+## Type Safety Notes
+
+- **Connection Handling**: After `checkConnection()` or `getConnection()`, connection is guaranteed to be `AbstractProtocol`
+- **IDLE Operations**: `Folder::idle()` requires `ImapProtocol` (not available in LegacyProtocol)
+- **Magic Properties**: Message, Attachment, and other classes use magic `__get()/__set()` extensively
+  - Properties are dynamically stored in `$attributes` array
+  - PHPDoc `@property` tags document available magic properties
+- **UID Types**: `getUid()` returns `array|int|false` depending on parameters
+  - `null` parameter: returns array of all UIDs
+  - `int` parameter: returns single UID or false on failure
+- **Fetch Options**: Use `INF` (float) for "last message" in range fetches
+- **Boolean vs Int**:
+  - `cert_validation` is stored as bool internally
+  - `fetch_body` and `fetch_flags` are bool, not int
+- **WhereQuery Values**: The `where()` method accepts mixed values (string, Carbon, int, arrays)
