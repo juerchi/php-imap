@@ -119,7 +119,7 @@ class WhereQuery extends Query {
     /**
      * Register search parameters
      * @param mixed $criteria
-     * @param null $value
+     * @param mixed $value
      *
      * @return $this
      * @throws InvalidWhereQueryCriteriaException
