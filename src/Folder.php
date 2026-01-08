@@ -264,7 +264,7 @@ class Folder
      * @throws Exceptions\MessageNotFoundException
      * @throws Exceptions\RuntimeException
      */
-    public function overview(string $sequence = null): array
+    public function overview(?string $sequence = null): array
     {
         $this->client->openFolder($this->path);
         $sequence ??= '1:*';
@@ -283,7 +283,7 @@ class Folder
      * @throws Exceptions\ConnectionFailedException
      * @throws Exceptions\RuntimeException
      */
-    public function appendMessage(string $message, array $options = null, $internal_date = null): bool
+    public function appendMessage(string $message, ?array $options = null, $internal_date = null): bool
     {
         /**
          * Check if $internal_date is parsed. If it is null it should not be set. Otherwise, the message can't be stored.

@@ -102,7 +102,7 @@ class ClientManager
      * @return Client
      * @throws Exceptions\MaskNotFoundException
      */
-    public function account(string $name = null): Client
+    public function account(?string $name = null): Client
     {
         $name = $name ?: $this->getDefaultAccount();
 

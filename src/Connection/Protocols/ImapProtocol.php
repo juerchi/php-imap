@@ -326,7 +326,7 @@ class ImapProtocol extends AbstractProtocol
      *
      * @throws RuntimeException
      */
-    public function sendRequest(string $command, array $tokens = [], string &$tag = null)
+    public function sendRequest(string $command, array $tokens = [], ?string &$tag = null)
     {
         if (!$tag) {
             $this->noun++;

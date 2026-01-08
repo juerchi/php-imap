@@ -473,7 +473,7 @@ class EncodingAliases
      *
      * @return string
      */
-    public static function get($encoding, string $fallback = null): string
+    public static function get($encoding, ?string $fallback = null): string
     {
         if (isset(self::$aliases[strtolower($encoding ?? '')])) {
             return self::$aliases[strtolower($encoding ?? '')];

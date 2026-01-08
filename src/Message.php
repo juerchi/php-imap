@@ -32,21 +32,21 @@ use Webklex\PHPIMAP\Traits\HasEvents;
  *
  * @package Webklex\PHPIMAP
  *
- * @property integer msglist
- * @property integer uid
- * @property integer msgn
- * @property Attribute|null subject
- * @property Attribute|null message_id
- * @property Attribute|null message_no
- * @property Attribute|null references
- * @property Attribute|null date
- * @property Attribute|null from
- * @property Attribute|null to
- * @property Attribute|null cc
- * @property Attribute|null bcc
- * @property Attribute|null reply_to
- * @property Attribute|null in_reply_to
- * @property Attribute|null sender
+ * @property integer $msglist
+ * @property integer $uid
+ * @property integer $msgn
+ * @property Attribute|null $subject
+ * @property Attribute|null $message_id
+ * @property Attribute|null $message_no
+ * @property Attribute|null $references
+ * @property Attribute|null $date
+ * @property Attribute|null $from
+ * @property Attribute|null $to
+ * @property Attribute|null $cc
+ * @property Attribute|null $bcc
+ * @property Attribute|null $reply_to
+ * @property Attribute|null $in_reply_to
+ * @property Attribute|null $sender
  *
  * @method integer getMsglist()
  * @method integer setMsglist($msglist)
@@ -189,10 +189,10 @@ class Message
         int $uid,
         $msglist,
         Client $client,
-        int $fetch_options = null,
+        ?int $fetch_options = null,
         bool $fetch_body = false,
         bool $fetch_flags = false,
-        int $sequence = null
+        ?int $sequence = null
     ) {
         $this->boot();
 
@@ -826,9 +826,9 @@ class Message
      * @throws Exceptions\RuntimeException
      */
     public function thread(
-        Folder $sent_folder = null,
-        MessageCollection &$thread = null,
-        Folder $folder = null
+        ?Folder $sent_folder = null,
+        ?MessageCollection &$thread = null,
+        ?Folder $folder = null
     ): MessageCollection {
         $thread = $thread ?: MessageCollection::make([]);
         $folder = $folder ?: $this->getFolder();
@@ -1050,7 +1050,7 @@ class Message
      * @throws MessageFlagException
      * @throws MessageHeaderFetchingException
      */
-    public function delete(bool $expunge = true, string $trash_path = null, bool $force_move = false)
+    public function delete(bool $expunge = true, ?string $trash_path = null, bool $force_move = false)
     {
         $status = $this->setFlag("Deleted");
         if ($force_move) {
@@ -1331,7 +1331,7 @@ class Message
      * @param null|Message $message
      * @return boolean
      */
-    public function is(Message $message = null): bool
+    public function is(?Message $message = null): bool
     {
         if (is_null($message)) {
             return false;
@@ -1512,7 +1512,7 @@ class Message
      * @throws Exceptions\MessageNotFoundException
      * @throws Exceptions\ConnectionFailedException
      */
-    public function setMsgn(int $msgn, int $msglist = null): Message
+    public function setMsgn(int $msgn, ?int $msglist = null): Message
     {
         $this->msgn = $msgn;
         $this->msglist = $msglist;
@@ -1547,7 +1547,7 @@ class Message
      * @throws Exceptions\ConnectionFailedException
      * @throws Exceptions\MessageNotFoundException
      */
-    public function setSequenceId(int $uid, int $msglist = null)
+    public function setSequenceId(int $uid, ?int $msglist = null)
     {
         if ($this->getSequence() === IMAP::ST_UID) {
             $this->setUid($uid);

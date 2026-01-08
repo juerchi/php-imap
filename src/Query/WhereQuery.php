@@ -171,7 +171,7 @@ class WhereQuery extends Query {
      *
      * @return $this
      */
-    public function orWhere(Closure $closure = null): WhereQuery {
+    public function orWhere(?Closure $closure = null): WhereQuery {
         $this->query->push(['OR']);
         if ($closure !== null) $closure($this);
 
@@ -183,7 +183,7 @@ class WhereQuery extends Query {
      *
      * @return $this
      */
-    public function andWhere(Closure $closure = null): WhereQuery {
+    public function andWhere(?Closure $closure = null): WhereQuery {
         $this->query->push(['AND']);
         if ($closure !== null) $closure($this);
 
