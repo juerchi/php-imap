@@ -12,7 +12,7 @@
 
 namespace Webklex\PHPIMAP\Connection\Protocols;
 
-use Carbon\Carbon;
+use DateTimeInterface;
 use Webklex\PHPIMAP\ClientManager;
 use Webklex\PHPIMAP\Exceptions\AuthFailedException;
 use Webklex\PHPIMAP\Exceptions\MethodNotSupportedException;
@@ -425,7 +425,7 @@ class LegacyProtocol extends AbstractProtocol
         $flagsString = is_array($flags) ? implode(' ', $flags) : $flags;
 
         if ($date !== null) {
-            if ($date instanceof Carbon) {
+            if ($date instanceof DateTimeInterface) {
                 $date = $date->format('d-M-Y H:i:s O');
             }
 

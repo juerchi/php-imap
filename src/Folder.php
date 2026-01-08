@@ -12,7 +12,7 @@
 
 namespace Webklex\PHPIMAP;
 
-use Carbon\Carbon;
+use DateTimeInterface;
 use Webklex\PHPIMAP\Connection\Protocols\AbstractProtocol;
 use Webklex\PHPIMAP\Connection\Protocols\ImapProtocol;
 use Webklex\PHPIMAP\Exceptions\ConnectionFailedException;
@@ -280,7 +280,7 @@ class Folder
      * Append a string message to the current mailbox
      * @param string $message
      * @param array|null $options
-     * @param string|null|Carbon $internal_date
+     * @param string|null|DateTimeInterface $internal_date
      *
      * @return bool
      * @throws Exceptions\ConnectionFailedException
@@ -291,10 +291,10 @@ class Folder
         /**
          * Check if $internal_date is parsed. If it is null it should not be set. Otherwise, the message can't be stored.
          * If this parameter is set, it will set the INTERNALDATE on the appended message. The parameter should be a
-         * date string that conforms to the rfc2060 specifications for a date_time value or be a Carbon object.
+         * date string that conforms to the rfc2060 specifications for a date_time value or be a DateTimeInterface object.
          */
 
-        if ($internal_date instanceof Carbon) {
+        if ($internal_date instanceof DateTimeInterface) {
             $internal_date = $internal_date->format('d-M-Y H:i:s O');
         }
 

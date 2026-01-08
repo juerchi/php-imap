@@ -13,8 +13,9 @@
 namespace Webklex\PHPIMAP;
 
 use ArrayAccess;
-use Carbon\Carbon;
+use DateTimeImmutable;
 use ReturnTypeWillChange;
+use Webklex\PHPIMAP\Exceptions\InvalidMessageDateException;
 
 /**
  * Class Attribute
@@ -78,16 +79,21 @@ class Attribute implements ArrayAccess
     /**
      * Convert first value to a date object
      *
-     * @return Carbon
+     * @return DateTimeImmutable
+     * @throws InvalidMessageDateException
      */
-    public function toDate(): Carbon
+    public function toDate(): DateTimeImmutable
     {
         $date = $this->first();
-        if ($date instanceof Carbon) {
+        if ($date instanceof DateTimeImmutable) {
             return $date;
         }
 
-        return Carbon::parse($date);
+        try {
+            return new DateTimeImmutable($date);
+        } catch (\Exception $e) {
+            throw new InvalidMessageDateException("Invalid date: $date", 0, $e);
+        }
     }
 
     /**

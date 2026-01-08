@@ -12,7 +12,8 @@
 
 namespace Webklex\PHPIMAP\Query;
 
-use Carbon\Carbon;
+use DateTimeImmutable;
+use DateTimeInterface;
 use Exception;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
@@ -125,7 +126,7 @@ class Query
      */
     protected function parse_value($value): string
     {
-        if ($value instanceof Carbon) {
+        if ($value instanceof DateTimeInterface) {
             $value = $value->format($this->date_format);
         }
 
@@ -133,25 +134,27 @@ class Query
     }
 
     /**
-     * Check if a given date is a valid carbon object and if not try to convert it
-     * @param string|Carbon $date
+     * Check if a given date is a valid DateTime object and if not try to convert it
+     * @param string|DateTimeInterface $date
      *
-     * @return Carbon
+     * @return DateTimeImmutable
      * @throws MessageSearchValidationException
      */
-    protected function parse_date($date): Carbon
+    protected function parse_date($date): DateTimeImmutable
     {
-        if ($date instanceof Carbon) {
+        if ($date instanceof DateTimeImmutable) {
             return $date;
         }
 
+        if ($date instanceof DateTimeInterface) {
+            return DateTimeImmutable::createFromInterface($date);
+        }
+
         try {
-            $date = Carbon::parse($date);
+            return new DateTimeImmutable($date);
         } catch (Exception $e) {
             throw new MessageSearchValidationException();
         }
-
-        return $date;
     }
 
     /**

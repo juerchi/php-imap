@@ -12,7 +12,7 @@
 
 namespace Webklex\PHPIMAP;
 
-use Carbon\Carbon;
+use DateTimeImmutable;
 use Webklex\PHPIMAP\Exceptions\InvalidMessageDateException;
 use Webklex\PHPIMAP\Exceptions\MethodNotFoundException;
 
@@ -746,14 +746,14 @@ class Header
                 if (str_contains($date, '&nbsp;')) {
                     $date = str_replace('&nbsp;', ' ', $date);
                 }
-                $parsed_date = Carbon::parse($date);
+                $parsed_date = new DateTimeImmutable($date);
             } catch (\Exception $e) {
                 switch (true) {
                     case preg_match(
                         '/([0-9]{4}\.[0-9]{1,2}\.[0-9]{1,2}\-[0-9]{1,2}\.[0-9]{1,2}.[0-9]{1,2})+$/',
                         $date
                     ) > 0:
-                        $date = Carbon::createFromFormat("Y.m.d-H.i.s", $date);
+                        $date = DateTimeImmutable::createFromFormat("Y.m.d-H.i.s", $date);
                         break;
                     case preg_match(
                         '/([0-9]{1,2}\ [A-Z]{2,3}\ [0-9]{4}\ [0-9]{1,2}\:[0-9]{1,2}\:[0-9]{1,2}\ UT)+$/i',
@@ -797,7 +797,7 @@ class Header
                         break;
                 }
                 try {
-                    $parsed_date = Carbon::parse($date);
+                    $parsed_date = new DateTimeImmutable($date);
                 } catch (\Exception) {
                     if (!isset($this->config["fallback_date"])) {
                         throw new InvalidMessageDateException(
@@ -807,7 +807,7 @@ class Header
                         );
                     }
 
-                    $parsed_date = Carbon::parse($this->config["fallback_date"]);
+                    $parsed_date = new DateTimeImmutable($this->config["fallback_date"]);
                 }
             }
 
