@@ -28,7 +28,7 @@ class MessageMask extends Mask {
     /**
      * Get the message html body
      *
-     * @return null
+     * @return string|null
      */
     public function getHtmlBody(){
         $bodies = $this->parent->getBodies();

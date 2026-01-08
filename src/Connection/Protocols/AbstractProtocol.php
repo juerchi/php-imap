@@ -123,9 +123,8 @@ abstract class AbstractProtocol implements ProtocolInterface
 
     /**
      * Set SSL certificate validation
+     * @param int $cert_validation
      * @return $this
-     * @var int $cert_validation
-     *
      */
     public function setCertValidation($cert_validation)
     {
@@ -146,9 +145,8 @@ abstract class AbstractProtocol implements ProtocolInterface
 
     /**
      * Set connection proxy settings
+     * @param array $options
      * @return $this
-     * @var array $options
-     *
      */
     public function setProxy($options)
     {
@@ -173,9 +171,8 @@ abstract class AbstractProtocol implements ProtocolInterface
 
     /**
      * Prepare socket options
+     * @param string $transport
      * @return array
-     * @var string $transport
-     *
      */
     private function defaultSocketOptions($transport)
     {

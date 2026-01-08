@@ -68,7 +68,7 @@ class PaginatedCollection extends Collection {
 
     /**
      * Get and set the total amount
-     * @param null $total
+     * @param int|null $total
      *
      * @return int|null
      */

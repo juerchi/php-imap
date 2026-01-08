@@ -28,7 +28,7 @@ class FolderMovedEvent extends Event {
 
     /**
      * Create a new event instance.
-     * @var Folder[] $folders
+     * @param Folder[] $folders
      * @return void
      */
     public function __construct($folders) {

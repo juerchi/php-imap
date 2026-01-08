@@ -26,7 +26,7 @@ class MessageNewEvent extends Event {
 
     /**
      * Create a new event instance.
-     * @var Message[] $messages
+     * @param Message[] $messages
      * @return void
      */
     public function __construct($messages) {

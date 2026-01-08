@@ -29,7 +29,7 @@ class FlagNewEvent extends Event {
 
     /**
      * Create a new event instance.
-     * @var mixed[] $arguments
+     * @param mixed[] $arguments
      * @return void
      */
     public function __construct($arguments) {

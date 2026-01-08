@@ -103,9 +103,8 @@ class Structure
      * Find all available headers and return the left over body segment
      * @return Part[]
      * @throws InvalidMessageDateException
-     * @var string $context
-     * @var integer $part_number
-     *
+     * @param string $context
+     * @param integer $part_number
      */
     private function parsePart(string $context, int $part_number = 0): array
     {
