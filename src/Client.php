@@ -274,10 +274,10 @@ class Client
     /**
      * Get the current imap resource
      *
-     * @return bool|AbstractProtocol|ProtocolInterface
+     * @return AbstractProtocol
      * @throws ConnectionFailedException
      */
-    public function getConnection()
+    public function getConnection(): AbstractProtocol
     {
         $this->checkConnection();
 
