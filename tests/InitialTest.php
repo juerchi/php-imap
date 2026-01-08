@@ -16,7 +16,8 @@ use \Webklex\PHPIMAP\ClientManager;
 class InitialTest extends TestCase {
     protected $cm;
 
-    public function setUp() {
+    protected function setUp(): void {
+        parent::setUp();
         $this->cm = new ClientManager();
     }
 
