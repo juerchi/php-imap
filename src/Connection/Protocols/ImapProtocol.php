@@ -41,7 +41,7 @@ class ImapProtocol extends AbstractProtocol
      */
     public function __construct(bool $cert_validation = true, $encryption = false)
     {
-        $this->setCertValidation($cert_validation);
+        $this->setCertValidation((int)$cert_validation);
         $this->encryption = $encryption;
     }
 
@@ -496,7 +496,7 @@ class ImapProtocol extends AbstractProtocol
             } catch (Exception) {
             }
             fclose($this->stream);
-            $this->stream = null;
+            $this->stream = false;
             $this->uid_cache = null;
         }
 
@@ -798,7 +798,7 @@ class ImapProtocol extends AbstractProtocol
      * @param int|string $uid set to IMAP::ST_UID or any string representing the UID - set to IMAP::ST_MSGN to use
      * message numbers instead.
      *
-     * @return array|string
+     * @return array
      * @throws RuntimeException
      */
     public function headers($uids, string $rfc = 'RFC822', $uid = IMAP::ST_UID): array

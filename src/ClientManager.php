@@ -68,7 +68,7 @@ class ClientManager
     /**
      * Get a dotted config parameter
      * @param string $key
-     * @param null $default
+     * @param mixed $default
      *
      * @return mixed|null
      */

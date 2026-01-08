@@ -666,6 +666,7 @@ class Client
             $this->reconnect();
         }
 
+        $this->checkConnection();
         return $this->connection;
     }
 
@@ -678,7 +679,7 @@ class Client
     public function getTimeout(): int
     {
         $this->checkConnection();
-
+        assert($this->connection instanceof AbstractProtocol);
         return $this->connection->getConnectionTimeout();
     }
 
