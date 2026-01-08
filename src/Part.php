@@ -232,9 +232,9 @@ class Part
      * Try to parse the subtype if any is present
      * @param $content_type
      *
-     * @return string
+     * @return string|null
      */
-    private function parseSubtype($content_type)
+    private function parseSubtype($content_type): ?string
     {
         if (is_array($content_type)) {
             foreach ($content_type as $part) {

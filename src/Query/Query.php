@@ -61,10 +61,10 @@ class Query {
     /** @var int $fetch_options */
     protected $fetch_options = null;
 
-    /** @var int $fetch_body */
+    /** @var bool $fetch_body */
     protected $fetch_body = true;
 
-    /** @var int $fetch_flags */
+    /** @var bool $fetch_flags */
     protected $fetch_flags = true;
 
     /** @var int|string $sequence */
@@ -794,17 +794,17 @@ class Query {
     }
 
     /**
-     * @return int
+     * @return bool
      */
-    public function getFetchFlags() {
+    public function getFetchFlags(): bool {
         return $this->fetch_flags;
     }
 
     /**
-     * @param int $fetch_flags
+     * @param bool $fetch_flags
      * @return Query
      */
-    public function setFetchFlags(int $fetch_flags): Query {
+    public function setFetchFlags(bool $fetch_flags): Query {
         $this->fetch_flags = $fetch_flags;
         return $this;
     }
@@ -867,18 +867,16 @@ class Query {
     }
 
     /**
+     * @param boolean $state
      * @return Query
-     * @var boolean $state
-     *
      */
     public function softFail(bool $state = true): Query {
         return $this->setSoftFail($state);
     }
 
     /**
+     * @param boolean $state
      * @return Query
-     * @var boolean $state
-     *
      */
     public function setSoftFail(bool $state = true): Query {
         $this->soft_fail = $state;
@@ -917,9 +915,8 @@ class Query {
 
     /**
      * Check if there are any errors / exceptions present
+     * @param integer|null $uid
      * @return boolean
-     * @var integer|null $uid
-     *
      */
     public function hasErrors($uid = null): bool {
         if ($uid !== null) {
@@ -930,9 +927,8 @@ class Query {
 
     /**
      * Check if there is an error / exception present
+     * @param integer $uid
      * @return boolean
-     * @var integer $uid
-     *
      */
     public function hasError(int $uid): bool {
         return isset($this->errors[$uid]);
@@ -958,9 +954,8 @@ class Query {
 
     /**
      * Get a specific error / exception
+     * @param integer $uid
      * @return Exception|null
-     * @var integer $uid
-     *
      */
     public function error(int $uid) {
         return $this->getError($uid);
@@ -968,9 +963,8 @@ class Query {
 
     /**
      * Get a specific error / exception
+     * @param integer $uid
      * @return Exception|null
-     * @var integer $uid
-     *
      */
     public function getError(int $uid) {
         if ($this->hasError($uid)) {

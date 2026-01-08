@@ -14,6 +14,7 @@ namespace Webklex\PHPIMAP;
 
 use Carbon\Carbon;
 use Webklex\PHPIMAP\Connection\Protocols\AbstractProtocol;
+use Webklex\PHPIMAP\Connection\Protocols\ImapProtocol;
 use Webklex\PHPIMAP\Exceptions\ConnectionFailedException;
 use Webklex\PHPIMAP\Exceptions\NotSupportedCapabilityException;
 use Webklex\PHPIMAP\Exceptions\RuntimeException;
@@ -399,14 +400,14 @@ class Folder
         }
         $this->client->openFolder($this->path, true);
         $connection = $this->client->getConnection();
-        assert($connection instanceof AbstractProtocol);
+        assert($connection instanceof ImapProtocol);
         $connection->idle();
 
         $sequence = ClientManager::get('options.sequence', IMAP::ST_MSGN);
 
         while (true) {
             try {
-                // This polymorphic call is fine - Protocol::idle() will throw an exception beforehand
+                assert($connection instanceof ImapProtocol);
                 $line = $connection->nextLine();
 
                 if (($pos = strpos($line, 'EXISTS')) !== false) {

@@ -32,8 +32,8 @@ use Webklex\PHPIMAP\Traits\HasEvents;
  *
  * @package Webklex\PHPIMAP
  *
- * @property integer $msglist
- * @property integer $uid
+ * @property integer|null $msglist
+ * @property integer|string|array $uid
  * @property integer $msgn
  * @property Attribute|null $subject
  * @property Attribute|null $message_id
@@ -73,7 +73,7 @@ class Message
     /**
      * Client instance
      *
-     * @var Client
+     * @var Client|string
      */
     private $client = Client::class;
 
@@ -321,7 +321,8 @@ class Message
             $name = Str::snake(substr($method, 3));
 
             if (in_array($name, array_keys($this->attributes))) {
-                return $this->__set($name, array_pop($arguments));
+                $this->__set($name, array_pop($arguments));
+                return $this;
             }
 
         }
@@ -334,13 +335,11 @@ class Message
      * @param $name
      * @param $value
      *
-     * @return mixed
+     * @return void
      */
-    public function __set($name, $value)
+    public function __set($name, $value): void
     {
         $this->attributes[$name] = $value;
-
-        return $this->attributes[$name];
     }
 
     /**
@@ -762,7 +761,7 @@ class Message
         //     https://en.wikipedia.org/wiki/ASCII
         //
         // convertEncoding() function basically means convertToUtf8(), so when we convert ASCII string into UTF-8 it gets broken.
-        if (strtolower($from ?? '') == 'us-ascii' && $to == 'UTF-8') {
+        if (strtolower($from) == 'us-ascii' && $to == 'UTF-8') {
             return $str;
         }
 
@@ -781,17 +780,17 @@ class Message
      * Get the encoding of a given abject
      * @param string|object $structure
      *
-     * @return string|null
+     * @return string
      */
     public function getEncoding($structure): string
     {
-        if (property_exists($structure, 'parameters')) {
+        if (is_object($structure) && property_exists($structure, 'parameters')) {
             foreach ($structure->parameters as $parameter) {
                 if (strtolower($parameter->attribute) == "charset") {
                     return EncodingAliases::get($parameter->value, "ISO-8859-2");
                 }
             }
-        } elseif (property_exists($structure, 'charset')) {
+        } elseif (is_object($structure) && property_exists($structure, 'charset')) {
             return EncodingAliases::get($structure->charset, "ISO-8859-2");
         } elseif (is_string($structure) === true) {
             return mb_detect_encoding($structure);
@@ -819,7 +818,7 @@ class Message
      * @param MessageCollection|null $thread
      * @param Folder|null $folder
      *
-     * @return MessageCollection|null
+     * @return MessageCollection
      * @throws Exceptions\ConnectionFailedException
      * @throws Exceptions\FolderFetchingException
      * @throws Exceptions\GetMessagesFailedException
