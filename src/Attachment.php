@@ -52,7 +52,6 @@ use Webklex\PHPIMAP\Support\Masks\AttachmentMask;
  */
 class Attachment
 {
-
     /**
      * @var Message $oMessage
      */
@@ -205,7 +204,6 @@ class Attachment
      */
     protected function fetch()
     {
-
         $content = $this->part->content;
 
         $this->content_type = $this->part->content_type;

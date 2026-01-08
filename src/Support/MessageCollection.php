@@ -17,6 +17,6 @@ namespace Webklex\PHPIMAP\Support;
  *
  * @package Webklex\PHPIMAP\Support
  */
-class MessageCollection extends PaginatedCollection {
-
+class MessageCollection extends PaginatedCollection
+{
 }

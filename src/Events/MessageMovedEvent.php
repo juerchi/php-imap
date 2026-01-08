@@ -19,8 +19,8 @@ use Webklex\PHPIMAP\Message;
  *
  * @package Webklex\PHPIMAP\Events
  */
-class MessageMovedEvent extends Event {
-
+class MessageMovedEvent extends Event
+{
     /** @var Message $old_message */
     public $old_message;
     /** @var Message $new_message */
@@ -31,7 +31,8 @@ class MessageMovedEvent extends Event {
      * @param Message[] $messages
      * @return void
      */
-    public function __construct($messages) {
+    public function __construct($messages)
+    {
         $this->old_message = $messages[0];
         $this->new_message = $messages[1];
     }

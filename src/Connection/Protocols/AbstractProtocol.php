@@ -23,7 +23,6 @@ use Webklex\PHPIMAP\IMAP;
  */
 abstract class AbstractProtocol implements ProtocolInterface
 {
-
     /**
      * Default connection timeout in seconds
      */

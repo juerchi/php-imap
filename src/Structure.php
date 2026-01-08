@@ -12,7 +12,6 @@
 
 namespace Webklex\PHPIMAP;
 
-
 use Webklex\PHPIMAP\Exceptions\InvalidMessageDateException;
 use Webklex\PHPIMAP\Exceptions\MessageContentFetchingException;
 
@@ -23,7 +22,6 @@ use Webklex\PHPIMAP\Exceptions\MessageContentFetchingException;
  */
 class Structure
 {
-
     /**
      * Raw structure
      *

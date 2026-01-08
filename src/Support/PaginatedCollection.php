@@ -21,8 +21,8 @@ use Illuminate\Pagination\Paginator;
  *
  * @package Webklex\PHPIMAP\Support
  */
-class PaginatedCollection extends Collection {
-
+class PaginatedCollection extends Collection
+{
     /**
      * Number of total entries
      *
@@ -39,7 +39,8 @@ class PaginatedCollection extends Collection {
      *
      * @return LengthAwarePaginator
      */
-    public function paginate(int $per_page = 15, $page = null, string $page_name = 'page', bool $prepaginated = false): LengthAwarePaginator {
+    public function paginate(int $per_page = 15, $page = null, string $page_name = 'page', bool $prepaginated = false): LengthAwarePaginator
+    {
         $page = $page ?: Paginator::resolveCurrentPage($page_name);
 
         $total = $this->total ?: $this->count();
@@ -62,7 +63,8 @@ class PaginatedCollection extends Collection {
      *
      * @return LengthAwarePaginator
      */
-    protected function paginator(array $items, int $total, int $per_page, $current_page, array $options): LengthAwarePaginator {
+    protected function paginator(array $items, int $total, int $per_page, $current_page, array $options): LengthAwarePaginator
+    {
         return new LengthAwarePaginator($items, $total, $per_page, $current_page, $options);
     }
 
@@ -72,8 +74,9 @@ class PaginatedCollection extends Collection {
      *
      * @return int|null
      */
-    public function total($total = null) {
-        if($total === null) {
+    public function total($total = null)
+    {
+        if ($total === null) {
             return $this->total;
         }
 

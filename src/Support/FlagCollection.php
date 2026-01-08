@@ -17,6 +17,6 @@ namespace Webklex\PHPIMAP\Support;
  *
  * @package Webklex\PHPIMAP\Support
  */
-class FlagCollection extends PaginatedCollection {
-
+class FlagCollection extends PaginatedCollection
+{
 }

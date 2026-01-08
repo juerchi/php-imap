@@ -268,7 +268,6 @@ class Client
                 throw new MaskNotFoundException("Unknown mask provided: ".$default_config['attachment']);
             }
         }
-
     }
 
     /**

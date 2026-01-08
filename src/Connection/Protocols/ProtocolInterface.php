@@ -26,8 +26,8 @@ use Webklex\PHPIMAP\IMAP;
  *
  * @package Webklex\PHPIMAP\Connection\Protocols
  */
-interface ProtocolInterface {
-
+interface ProtocolInterface
+{
     /**
      * Public destructor
      */

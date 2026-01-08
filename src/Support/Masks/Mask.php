@@ -20,8 +20,8 @@ use Webklex\PHPIMAP\Exceptions\MethodNotFoundException;
  *
  * @package Webklex\PHPIMAP\Support\Masks
  */
-class Mask {
-
+class Mask
+{
     /**
      * Available attributes
      *
@@ -40,10 +40,11 @@ class Mask {
      * Mask constructor.
      * @param $parent
      */
-    public function __construct($parent) {
+    public function __construct($parent)
+    {
         $this->parent = $parent;
 
-        if(method_exists($this->parent, 'getAttributes')){
+        if (method_exists($this->parent, 'getAttributes')) {
             $this->attributes = array_merge($this->attributes, $this->parent->getAttributes());
         }
 
@@ -53,7 +54,9 @@ class Mask {
     /**
      * Boot method made to be used by any custom mask
      */
-    protected function boot(){}
+    protected function boot()
+    {
+    }
 
     /**
      * Call dynamic attribute setter and getter methods and inherit the parent calls
@@ -63,26 +66,25 @@ class Mask {
      * @return mixed
      * @throws MethodNotFoundException
      */
-    public function __call(string $method, array $arguments) {
-        if(strtolower(substr($method, 0, 3)) === 'get') {
+    public function __call(string $method, array $arguments)
+    {
+        if (strtolower(substr($method, 0, 3)) === 'get') {
             $name = Str::snake(substr($method, 3));
 
-            if(isset($this->attributes[$name])) {
+            if (isset($this->attributes[$name])) {
                 return $this->attributes[$name];
             }
-
-        }elseif (strtolower(substr($method, 0, 3)) === 'set') {
+        } elseif (strtolower(substr($method, 0, 3)) === 'set') {
             $name = Str::snake(substr($method, 3));
 
-            if(isset($this->attributes[$name])) {
+            if (isset($this->attributes[$name])) {
                 $this->attributes[$name] = array_pop($arguments);
 
                 return $this->attributes[$name];
             }
-
         }
 
-        if(method_exists($this->parent, $method) === true){
+        if (method_exists($this->parent, $method) === true) {
             return call_user_func_array([$this->parent, $method], $arguments);
         }
 
@@ -96,7 +98,8 @@ class Mask {
      *
      * @return void
      */
-    public function __set($name, $value): void {
+    public function __set($name, $value): void
+    {
         $this->attributes[$name] = $value;
     }
 
@@ -106,8 +109,9 @@ class Mask {
      *
      * @return mixed|null
      */
-    public function __get($name) {
-        if(isset($this->attributes[$name])) {
+    public function __get($name)
+    {
+        if (isset($this->attributes[$name])) {
             return $this->attributes[$name];
         }
 
@@ -119,7 +123,8 @@ class Mask {
      *
      * @return object
      */
-    public function getParent(){
+    public function getParent()
+    {
         return $this->parent;
     }
 
@@ -128,8 +133,8 @@ class Mask {
      *
      * @return array
      */
-    public function getAttributes(): array {
+    public function getAttributes(): array
+    {
         return $this->attributes;
     }
-
 }

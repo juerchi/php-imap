@@ -23,7 +23,6 @@ use Psr\Log\LoggerInterface;
  */
 class ClientManager
 {
-
     /**
      * All library config
      */
@@ -173,7 +172,6 @@ class ClientManager
      */
     public function setConfig(array|string $config): ClientManager
     {
-
         if (is_array($config) === false) {
             $config = require $config;
         }
@@ -187,7 +185,6 @@ class ClientManager
         if (is_array($config)) {
             if (isset($config['default'])) {
                 if (isset($config['accounts']) && $config['default']) {
-
                     $default_config = $vendor_config['accounts']['default'];
                     if (isset($config['accounts'][$config['default']])) {
                         $default_config = array_merge($default_config, $config['accounts'][$config['default']]);
@@ -236,13 +233,11 @@ class ClientManager
         }
 
         foreach ($arrays as $append) {
-
             if (!is_array($append)) {
                 $append = array($append);
             }
 
             foreach ($append as $key => $value) {
-
                 if (!array_key_exists($key, $base) && !is_numeric($key)) {
                     $base[$key] = $value;
                     continue;
@@ -265,9 +260,7 @@ class ClientManager
                         $base[$key] = $value;
                     }
                 }
-
             }
-
         }
 
         return $base;

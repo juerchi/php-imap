@@ -190,7 +190,8 @@ class Folder
      *
      * @return self
      */
-    public function setChildren(FolderCollection $children): Folder {
+    public function setChildren(FolderCollection $children): Folder
+    {
         $this->children = $children;
 
         return $this;

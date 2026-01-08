@@ -28,7 +28,6 @@ use Webklex\PHPIMAP\IMAP;
  */
 class ImapProtocol extends AbstractProtocol
 {
-
     /**
      * Request noun
      */
@@ -837,8 +836,8 @@ class ImapProtocol extends AbstractProtocol
     public function getUid($id = null)
     {
         if (!$this->enable_uid_cache || $this->uid_cache === null || ($this->uid_cache && count(
-                    $this->uid_cache
-                ) <= 0)) {
+            $this->uid_cache
+        ) <= 0)) {
             try {
                 $this->setUidCache($this->fetch('UID', 1, INF)); // set cache for this folder
             } catch (RuntimeException) {

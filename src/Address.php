@@ -19,7 +19,6 @@ namespace Webklex\PHPIMAP;
  */
 class Address
 {
-
     /**
      * Address attributes
      */

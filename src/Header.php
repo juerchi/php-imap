@@ -12,7 +12,6 @@
 
 namespace Webklex\PHPIMAP;
 
-
 use Carbon\Carbon;
 use Webklex\PHPIMAP\Exceptions\InvalidMessageDateException;
 use Webklex\PHPIMAP\Exceptions\MethodNotFoundException;
@@ -24,7 +23,6 @@ use Webklex\PHPIMAP\Exceptions\MethodNotFoundException;
  */
 class Header
 {
-
     /**
      * Raw header
      *
@@ -91,7 +89,6 @@ class Header
             if (in_array($name, array_keys($this->attributes))) {
                 return $this->attributes[$name];
             }
-
         }
 
         throw new MethodNotFoundException("Method ".self::class.'::'.$method.'() is not supported');
@@ -385,7 +382,6 @@ class Header
      */
     public function convertEncoding($str, $from = "ISO-8859-2", $to = "UTF-8")
     {
-
         $from = EncodingAliases::get($from, $this->fallback_encoding);
         $to = EncodingAliases::get($to, $this->fallback_encoding);
 
@@ -538,21 +534,21 @@ class Header
             return;
         }
         switch ((int)"$priority") {
-            case IMAP::MESSAGE_PRIORITY_HIGHEST;
-                $priority = IMAP::MESSAGE_PRIORITY_HIGHEST;
-                break;
-            case IMAP::MESSAGE_PRIORITY_HIGH;
-                $priority = IMAP::MESSAGE_PRIORITY_HIGH;
-                break;
-            case IMAP::MESSAGE_PRIORITY_NORMAL;
-                $priority = IMAP::MESSAGE_PRIORITY_NORMAL;
-                break;
-            case IMAP::MESSAGE_PRIORITY_LOW;
-                $priority = IMAP::MESSAGE_PRIORITY_LOW;
-                break;
-            case IMAP::MESSAGE_PRIORITY_LOWEST;
-                $priority = IMAP::MESSAGE_PRIORITY_LOWEST;
-                break;
+            case IMAP::MESSAGE_PRIORITY_HIGHEST:
+            $priority = IMAP::MESSAGE_PRIORITY_HIGHEST;
+            break;
+            case IMAP::MESSAGE_PRIORITY_HIGH:
+            $priority = IMAP::MESSAGE_PRIORITY_HIGH;
+            break;
+            case IMAP::MESSAGE_PRIORITY_NORMAL:
+            $priority = IMAP::MESSAGE_PRIORITY_NORMAL;
+            break;
+            case IMAP::MESSAGE_PRIORITY_LOW:
+            $priority = IMAP::MESSAGE_PRIORITY_LOW;
+            break;
+            case IMAP::MESSAGE_PRIORITY_LOWEST:
+            $priority = IMAP::MESSAGE_PRIORITY_LOWEST;
+            break;
             default:
                 $priority = IMAP::MESSAGE_PRIORITY_UNKNOWN;
                 break;
@@ -738,7 +734,6 @@ class Header
      */
     private function parseDate(object $header)
     {
-
         if (property_exists($header, 'date')) {
             $date = $header->date;
 
@@ -755,46 +750,47 @@ class Header
             } catch (\Exception $e) {
                 switch (true) {
                     case preg_match(
-                            '/([0-9]{4}\.[0-9]{1,2}\.[0-9]{1,2}\-[0-9]{1,2}\.[0-9]{1,2}.[0-9]{1,2})+$/',
-                            $date
-                        ) > 0:
+                        '/([0-9]{4}\.[0-9]{1,2}\.[0-9]{1,2}\-[0-9]{1,2}\.[0-9]{1,2}.[0-9]{1,2})+$/',
+                        $date
+                    ) > 0:
                         $date = Carbon::createFromFormat("Y.m.d-H.i.s", $date);
                         break;
                     case preg_match(
-                            '/([0-9]{1,2}\ [A-Z]{2,3}\ [0-9]{4}\ [0-9]{1,2}\:[0-9]{1,2}\:[0-9]{1,2}\ UT)+$/i',
-                            $date
-                        ) > 0:
+                        '/([0-9]{1,2}\ [A-Z]{2,3}\ [0-9]{4}\ [0-9]{1,2}\:[0-9]{1,2}\:[0-9]{1,2}\ UT)+$/i',
+                        $date
+                    ) > 0:
                     case preg_match(
-                            '/([A-Z]{2,3}\,\ [0-9]{1,2}\ [A-Z]{2,3}\ [0-9]{4}\ [0-9]{1,2}\:[0-9]{1,2}\:[0-9]{1,2}\ UT)+$/i',
-                            $date
-                        ) > 0:
+                        '/([A-Z]{2,3}\,\ [0-9]{1,2}\ [A-Z]{2,3}\ [0-9]{4}\ [0-9]{1,2}\:[0-9]{1,2}\:[0-9]{1,2}\ UT)+$/i',
+                        $date
+                    ) > 0:
                         $date .= 'C';
                         break;
                     case preg_match(
-                            '/([A-Z]{2,3}\,\ [0-9]{1,2}[\,]\ [A-Z]{2,3}\ [0-9]{4}\ [0-9]{1,2}\:[0-9]{1,2}\:[0-9]{1,2}\ [\-|\+][0-9]{4})+$/i',
-                            $date
-                        ) > 0:
+                        '/([A-Z]{2,3}\,\ [0-9]{1,2}[\,]\ [A-Z]{2,3}\ [0-9]{4}\ [0-9]{1,2}\:[0-9]{1,2}\:[0-9]{1,2}\ [\-|\+][0-9]{4})+$/i',
+                        $date
+                    ) > 0:
                         $date = str_replace(',', '', $date);
+                        // no break
                     case preg_match(
-                            '/([A-Z]{2,3}\,\ [0-9]{1,2}\ [A-Z]{2,3}\ [0-9]{4}\ [0-9]{1,2}\:[0-9]{1,2}\:[0-9]{1,2}\ \+[0-9]{2,4}\ \(\+[0-9]{1,2}\))+$/i',
-                            $date
-                        ) > 0:
+                        '/([A-Z]{2,3}\,\ [0-9]{1,2}\ [A-Z]{2,3}\ [0-9]{4}\ [0-9]{1,2}\:[0-9]{1,2}\:[0-9]{1,2}\ \+[0-9]{2,4}\ \(\+[0-9]{1,2}\))+$/i',
+                        $date
+                    ) > 0:
                     case preg_match(
-                            '/([A-Z]{2,3}[\,|\ \,]\ [0-9]{1,2}\ [A-Z]{2,3}\ [0-9]{4}\ [0-9]{1,2}\:[0-9]{1,2}\:[0-9]{1,2}.*)+$/i',
-                            $date
-                        ) > 0:
+                        '/([A-Z]{2,3}[\,|\ \,]\ [0-9]{1,2}\ [A-Z]{2,3}\ [0-9]{4}\ [0-9]{1,2}\:[0-9]{1,2}\:[0-9]{1,2}.*)+$/i',
+                        $date
+                    ) > 0:
                     case preg_match(
-                            '/([A-Z]{2,3}\,\ [0-9]{1,2}\ [A-Z]{2,3}\ [0-9]{4}\ [0-9]{1,2}\:[0-9]{1,2}\:[0-9]{1,2}\ [\-|\+][0-9]{4}\ \(.*)\)+$/i',
-                            $date
-                        ) > 0:
+                        '/([A-Z]{2,3}\,\ [0-9]{1,2}\ [A-Z]{2,3}\ [0-9]{4}\ [0-9]{1,2}\:[0-9]{1,2}\:[0-9]{1,2}\ [\-|\+][0-9]{4}\ \(.*)\)+$/i',
+                        $date
+                    ) > 0:
                     case preg_match(
-                            '/([A-Z]{2,3}\, \ [0-9]{1,2}\ [A-Z]{2,3}\ [0-9]{4}\ [0-9]{1,2}\:[0-9]{1,2}\:[0-9]{1,2}\ [\-|\+][0-9]{4}\ \(.*)\)+$/i',
-                            $date
-                        ) > 0:
+                        '/([A-Z]{2,3}\, \ [0-9]{1,2}\ [A-Z]{2,3}\ [0-9]{4}\ [0-9]{1,2}\:[0-9]{1,2}\:[0-9]{1,2}\ [\-|\+][0-9]{4}\ \(.*)\)+$/i',
+                        $date
+                    ) > 0:
                     case preg_match(
-                            '/([0-9]{1,2}\ [A-Z]{2,3}\ [0-9]{2,4}\ [0-9]{2}\:[0-9]{2}\:[0-9]{2}\ [A-Z]{2}\ \-[0-9]{2}\:[0-9]{2}\ \([A-Z]{2,3}\ \-[0-9]{2}:[0-9]{2}\))+$/i',
-                            $date
-                        ) > 0:
+                        '/([0-9]{1,2}\ [A-Z]{2,3}\ [0-9]{2,4}\ [0-9]{2}\:[0-9]{2}\:[0-9]{2}\ [A-Z]{2}\ \-[0-9]{2}\:[0-9]{2}\ \([A-Z]{2,3}\ \-[0-9]{2}:[0-9]{2}\))+$/i',
+                        $date
+                    ) > 0:
                         $array = explode('(', $date);
                         $array = array_reverse($array);
                         $date = trim(array_pop($array));
@@ -828,5 +824,4 @@ class Header
     {
         return $this->attributes;
     }
-
 }

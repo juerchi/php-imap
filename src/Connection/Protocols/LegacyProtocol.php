@@ -26,7 +26,6 @@ use Webklex\PHPIMAP\IMAP;
  */
 class LegacyProtocol extends AbstractProtocol
 {
-
     protected $protocol = "imap";
     protected $host = null;
     protected $port = null;

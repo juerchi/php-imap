@@ -324,7 +324,6 @@ class Message
                 $this->__set($name, array_pop($arguments));
                 return $this;
             }
-
         }
 
         throw new MethodNotFoundException("Method ".self::class.'::'.$method.'() is not supported');
@@ -506,9 +505,11 @@ class Message
 
         $sequence_id = $this->getSequenceId();
         try {
-            $contents = $this->client->getConnection()->content([$sequence_id],
+            $contents = $this->client->getConnection()->content(
+                [$sequence_id],
                 "RFC822",
-                $this->sequence === IMAP::ST_UID);
+                $this->sequence === IMAP::ST_UID
+            );
         } catch (Exceptions\RuntimeException $e) {
             throw new MessageContentFetchingException("failed to fetch content", 0);
         }
@@ -742,7 +743,6 @@ class Message
      */
     public function convertEncoding($str, string $from = "ISO-8859-2", string $to = "UTF-8")
     {
-
         $from = EncodingAliases::get($from);
         $to = EncodingAliases::get($to);
 
@@ -982,11 +982,11 @@ class Message
 
             $this->client->openFolder($this->folder_path);
             if ($this->client->getConnection()->moveMessage(
-                    $folder->path,
-                    $this->getSequenceId(),
-                    null,
-                    $this->sequence === IMAP::ST_UID
-                ) == true) {
+                $folder->path,
+                $this->getSequenceId(),
+                null,
+                $this->sequence === IMAP::ST_UID
+            ) == true) {
                 return $this->fetchNewMail($folder, $next_uid, "moved", $expunge);
             }
         }
@@ -1105,12 +1105,14 @@ class Message
         $flag = "\\".trim(is_array($flag) ? implode(" \\", $flag) : $flag);
         $sequence_id = $this->getSequenceId();
         try {
-            $status = $this->client->getConnection()->store([$flag],
+            $status = $this->client->getConnection()->store(
+                [$flag],
                 $sequence_id,
                 $sequence_id,
                 "+",
                 true,
-                $this->sequence === IMAP::ST_UID);
+                $this->sequence === IMAP::ST_UID
+            );
         } catch (Exceptions\RuntimeException $e) {
             throw new MessageFlagException("flag could not be set", 0, $e);
         }
@@ -1139,12 +1141,14 @@ class Message
         $flag = "\\".trim(is_array($flag) ? implode(" \\", $flag) : $flag);
         $sequence_id = $this->getSequenceId();
         try {
-            $status = $this->client->getConnection()->store([$flag],
+            $status = $this->client->getConnection()->store(
+                [$flag],
                 $sequence_id,
                 $sequence_id,
                 "-",
                 true,
-                $this->sequence === IMAP::ST_UID);
+                $this->sequence === IMAP::ST_UID
+            );
         } catch (Exceptions\RuntimeException $e) {
             throw new MessageFlagException("flag could not be removed", 0, $e);
         }

@@ -17,6 +17,6 @@ namespace Webklex\PHPIMAP\Events;
  *
  * @package Webklex\PHPIMAP\Events
  */
-class MessageDeletedEvent extends MessageNewEvent {
-
+class MessageDeletedEvent extends MessageNewEvent
+{
 }

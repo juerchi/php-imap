@@ -20,7 +20,6 @@ namespace Webklex\PHPIMAP;
  */
 class EncodingAliases
 {
-
     /**
      * Contains email encoding mappings
      *
@@ -481,5 +480,4 @@ class EncodingAliases
 
         return $fallback !== null ? $fallback : $encoding;
     }
-
 }

@@ -17,6 +17,6 @@ namespace Webklex\PHPIMAP\Events;
  *
  * @package Webklex\PHPIMAP\Events
  */
-class FolderDeletedEvent extends FolderNewEvent {
-
+class FolderDeletedEvent extends FolderNewEvent
+{
 }

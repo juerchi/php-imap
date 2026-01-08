@@ -12,7 +12,6 @@
 
 namespace Webklex\PHPIMAP\Traits;
 
-
 use Webklex\PHPIMAP\Events\Event;
 use Webklex\PHPIMAP\Exceptions\EventNotFoundException;
 
@@ -21,8 +20,8 @@ use Webklex\PHPIMAP\Exceptions\EventNotFoundException;
  *
  * @package Webklex\PHPIMAP\Traits
  */
-trait HasEvents {
-
+trait HasEvents
+{
     /**
      * Event holder
      *
@@ -36,7 +35,8 @@ trait HasEvents {
      * @param $event
      * @param $class
      */
-    public function setEvent($section, $event, $class) {
+    public function setEvent($section, $event, $class)
+    {
         if (isset($this->events[$section])) {
             $this->events[$section][$event] = $class;
         }
@@ -46,7 +46,8 @@ trait HasEvents {
      * Set all events
      * @param $events
      */
-    public function setEvents($events) {
+    public function setEvents($events)
+    {
         $this->events = $events;
     }
 
@@ -58,7 +59,8 @@ trait HasEvents {
      * @return Event|string
      * @throws EventNotFoundException
      */
-    public function getEvent($section, $event) {
+    public function getEvent($section, $event)
+    {
         if (isset($this->events[$section])) {
             return $this->events[$section][$event];
         }
@@ -70,8 +72,8 @@ trait HasEvents {
      *
      * @return array
      */
-    public function getEvents(): array {
+    public function getEvents(): array
+    {
         return $this->events;
     }
-
 }

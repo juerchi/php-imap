@@ -19,8 +19,8 @@ use Webklex\PHPIMAP\Folder;
  *
  * @package Webklex\PHPIMAP\Events
  */
-class FolderNewEvent extends Event {
-
+class FolderNewEvent extends Event
+{
     /** @var Folder $folder */
     public $folder;
 
@@ -29,7 +29,8 @@ class FolderNewEvent extends Event {
      * @param Folder[] $folders
      * @return void
      */
-    public function __construct($folders) {
+    public function __construct($folders)
+    {
         $this->folder = $folders[0];
     }
 }

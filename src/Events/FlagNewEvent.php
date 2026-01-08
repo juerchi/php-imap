@@ -19,8 +19,8 @@ use Webklex\PHPIMAP\Message;
  *
  * @package Webklex\PHPIMAP\Events
  */
-class FlagNewEvent extends Event {
-
+class FlagNewEvent extends Event
+{
     /** @var Message $message */
     public $message;
 
@@ -32,7 +32,8 @@ class FlagNewEvent extends Event {
      * @param mixed[] $arguments
      * @return void
      */
-    public function __construct($arguments) {
+    public function __construct($arguments)
+    {
         $this->message = $arguments[0];
         $this->flag = $arguments[1];
     }
