@@ -286,6 +286,7 @@ class Client
 
     /**
      * Determine if connection was established.
+     * @phpstan-assert-if-true AbstractProtocol $this->connection
      */
     public function isConnected(): bool
     {
@@ -296,6 +297,7 @@ class Client
      * Determine if connection was established and connect if not.
      *
      * @throws ConnectionFailedException
+     * @phpstan-assert AbstractProtocol $this->connection
      */
     public function checkConnection(): void
     {

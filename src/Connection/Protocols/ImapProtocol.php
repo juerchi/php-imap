@@ -41,7 +41,7 @@ class ImapProtocol extends AbstractProtocol
      */
     public function __construct(bool $cert_validation = true, $encryption = false)
     {
-        $this->setCertValidation((int)$cert_validation);
+        $this->setCertValidation($cert_validation);
         $this->encryption = $encryption;
     }
 
@@ -646,6 +646,9 @@ class ImapProtocol extends AbstractProtocol
             if ($tokens[1] !== 'FETCH') {
                 continue;
             }
+
+            $uidKey = 0; // initialize to avoid undefined variable warning
+            $data = null; // initialize to avoid undefined variable warning
 
             // find array key of UID value; try the last elements, or search for it
             if ($uid) {

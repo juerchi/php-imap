@@ -123,7 +123,7 @@ abstract class AbstractProtocol implements ProtocolInterface
 
     /**
      * Set SSL certificate validation
-     * @param int $cert_validation
+     * @param bool $cert_validation
      * @return $this
      */
     public function setCertValidation($cert_validation)

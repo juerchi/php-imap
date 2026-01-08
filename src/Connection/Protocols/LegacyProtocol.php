@@ -39,7 +39,7 @@ class LegacyProtocol extends AbstractProtocol
      */
     public function __construct(bool $cert_validation = true, $encryption = false)
     {
-        $this->setCertValidation((int)$cert_validation);
+        $this->setCertValidation($cert_validation);
         $this->encryption = $encryption;
     }
 
