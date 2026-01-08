@@ -336,7 +336,7 @@ class LegacyProtocol extends AbstractProtocol
      */
     public function getMessageNumber(string $id): int
     {
-        return \imap_msgno($this->stream, $id);
+        return \imap_msgno($this->stream, (int)$id);
     }
 
     /**
@@ -423,15 +423,17 @@ class LegacyProtocol extends AbstractProtocol
      */
     public function appendMessage(string $folder, string $message, $flags = null, $date = null): bool
     {
+        $flagsString = is_array($flags) ? implode(' ', $flags) : $flags;
+
         if ($date !== null) {
             if ($date instanceof Carbon) {
                 $date = $date->format('d-M-Y H:i:s O');
             }
 
-            return \imap_append($this->stream, $folder, $message, $flags, $date);
+            return \imap_append($this->stream, $folder, $message, $flagsString, $date);
         }
 
-        return \imap_append($this->stream, $folder, $message, $flags);
+        return \imap_append($this->stream, $folder, $message, $flagsString);
     }
 
     /**

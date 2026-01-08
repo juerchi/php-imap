@@ -612,7 +612,7 @@ class ImapProtocol extends AbstractProtocol
      * Fetch one or more items of one or more messages
      * @param string|array $items items to fetch [RFC822.HEADER, FLAGS, RFC822.TEXT, etc]
      * @param int|array $from message for items or start message if $to !== null
-     * @param int|null $to if null only one message ($from) is fetched, else it's the
+     * @param int|float|null $to if null only one message ($from) is fetched, else it's the
      *                             last message, INF means last message available
      * @param int|string $uid set to IMAP::ST_UID or any string representing the UID - set to IMAP::ST_MSGN to use
      * message numbers instead.
