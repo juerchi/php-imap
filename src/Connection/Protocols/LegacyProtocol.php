@@ -39,7 +39,7 @@ class LegacyProtocol extends AbstractProtocol
      */
     public function __construct(bool $cert_validation = true, $encryption = false)
     {
-        $this->setCertValidation($cert_validation);
+        $this->setCertValidation((int)$cert_validation);
         $this->encryption = $encryption;
     }
 
@@ -118,7 +118,7 @@ class LegacyProtocol extends AbstractProtocol
      * @param string $user username
      * @param string $token access token
      *
-     * @return bool|resource
+     * @return bool
      * @throws AuthFailedException|RuntimeException
      */
     public function authenticate(string $user, string $token): bool
@@ -305,7 +305,7 @@ class LegacyProtocol extends AbstractProtocol
      * Get uid for a given id
      * @param int|null $id message number
      *
-     * @return array|string message number for given message or all messages as array
+     * @return array|int|false message number for given message or all messages as array, false on failure
      */
     public function getUid($id = null)
     {
@@ -400,9 +400,9 @@ class LegacyProtocol extends AbstractProtocol
         $flag = trim(is_array($flags) ? implode(" ", $flags) : $flags);
 
         if ($mode === "+") {
-            $status = \imap_setflag_full($this->stream, $from, $flag, $uid ? IMAP::ST_UID : IMAP::NIL);
+            $status = \imap_setflag_full($this->stream, (string)$from, $flag, $uid ? IMAP::ST_UID : IMAP::NIL);
         } else {
-            $status = \imap_clearflag_full($this->stream, $from, $flag, $uid ? IMAP::ST_UID : IMAP::NIL);
+            $status = \imap_clearflag_full($this->stream, (string)$from, $flag, $uid ? IMAP::ST_UID : IMAP::NIL);
         }
 
         if ($silent === true) {
