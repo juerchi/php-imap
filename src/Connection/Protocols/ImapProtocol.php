@@ -318,7 +318,7 @@ final class ImapProtocol extends AbstractProtocol
     public function authenticate(string $user, string $token): bool
     {
         try {
-            $authenticateParams = ['XOAUTH2', base64_encode("user={$user}\1auth=Bearer {$token}\1\1")];
+            $authenticateParams = ['XOAUTH2', base64_encode("user=$user\1auth=Bearer $token\1\1")];
             $this->sendRequest('AUTHENTICATE', $authenticateParams);
 
             while (true) {
@@ -680,7 +680,7 @@ final class ImapProtocol extends AbstractProtocol
             try {
                 $fetched = $this->fetch('UID', 1, INF);
                 if (is_array($fetched)) {
-                    $this->setUidCache(array_values(array_map('intval', $fetched))); // set cache for this folder
+                    $this->setUidCache(array_values(array_map(intval(...), $fetched))); // set cache for this folder
                 }
             } catch (RuntimeException) {
             }
@@ -834,7 +834,7 @@ final class ImapProtocol extends AbstractProtocol
     }
 
     /**
-     * Copy a message set from current folder to an other folder.
+     * Copy a message set from current folder to another folder.
      *
      * @param string         $folder destination folder
      * @param null|float|int $to     if null only one message ($from) is fetched, else it's the
@@ -1310,7 +1310,7 @@ final class ImapProtocol extends AbstractProtocol
 
     /**
      * Split a given line into tokens. A token is either a scalar string or a
-     * nested list produced by parenthesised IMAP data (e.g. FLAGS, ENVELOPE).
+     * nested list produced by parenthesized IMAP data (e.g. FLAGS, ENVELOPE).
      *
      * The returned structure is a flat list at the top level; nested IMAP lists
      * become nested PHP arrays. Example:
@@ -1462,7 +1462,7 @@ final class ImapProtocol extends AbstractProtocol
                 $data = $tokens[2][3];
             } else {
                 $expectedResponse = false;
-                // maybe the server send an other field we didn't wanted
+                // maybe the server send another field we didn't wanted
                 $count = count($tokens[2]);
                 // we start with 2, because 0 was already checked
                 for ($i = 2; $i < $count; $i += 2) {
