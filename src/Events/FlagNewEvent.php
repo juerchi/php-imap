@@ -1,4 +1,5 @@
 <?php
+
 /*
 * File:     FlagNewEvent.php
 * Category: Event
@@ -15,26 +16,12 @@ namespace Webklex\PHPIMAP\Events;
 use Webklex\PHPIMAP\Message;
 
 /**
- * Class FlagNewEvent
- *
- * @package Webklex\PHPIMAP\Events
+ * Class FlagNewEvent.
  */
 class FlagNewEvent extends Event
 {
-    /** @var Message $message */
-    public $message;
-
-    /** @var string $flag */
-    public $flag;
-
-    /**
-     * Create a new event instance.
-     * @param mixed[] $arguments
-     * @return void
-     */
-    public function __construct($arguments)
-    {
-        $this->message = $arguments[0];
-        $this->flag = $arguments[1];
-    }
+    public function __construct(
+        public readonly Message $message,
+        public readonly string $flag,
+    ) {}
 }

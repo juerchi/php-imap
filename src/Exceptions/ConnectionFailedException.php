@@ -1,4 +1,5 @@
 <?php
+
 /*
 * File:     ConnectionFailedException.php
 * Category: Exception
@@ -12,13 +13,7 @@
 
 namespace Webklex\PHPIMAP\Exceptions;
 
-use Exception;
-
 /**
- * Class ConnectionFailedException
- *
- * @package Webklex\PHPIMAP\Exceptions
+ * Class ConnectionFailedException.
  */
-class ConnectionFailedException extends Exception
-{
-}
+class ConnectionFailedException extends \Exception {}

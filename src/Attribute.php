@@ -1,4 +1,5 @@
 <?php
+
 /*
 * File:     Attribute.php
 * Category: -
@@ -12,64 +13,33 @@
 
 namespace Webklex\PHPIMAP;
 
-use ArrayAccess;
-use DateTimeImmutable;
-use ReturnTypeWillChange;
 use Webklex\PHPIMAP\Exceptions\InvalidMessageDateException;
 
 /**
- * Class Attribute
- *
- * @package Webklex\PHPIMAP
+ * Class Attribute.
  */
-class Attribute implements ArrayAccess
+final class Attribute implements \ArrayAccess, \Stringable
 {
-    /** @var string $name */
-    protected $name;
-
     /**
-     * Value holder
-     *
-     * @var array $values
+     * Value holder.
      */
-    protected $values = [];
+    private array $values = [];
 
-    /**
-     * Attribute constructor.
-     * @param string $name
-     * @param array|mixed $value
-     */
-    public function __construct(string $name, $value = null)
+    public function __construct(public string $name, mixed $value = null)
     {
-        $this->setName($name);
         $this->add($value);
     }
 
-
     /**
-     * Return the stringified attribute
-     *
-     * @return string
+     * Return the stringified attribute.
      */
-    public function __toString()
+    public function __toString(): string
     {
-        return implode(", ", $this->values);
+        return implode(', ', $this->values);
     }
 
     /**
-     * Return the stringified attribute
-     *
-     * @return string
-     */
-    public function toString(): string
-    {
-        return $this->__toString();
-    }
-
-    /**
-     * Convert instance to array
-     *
-     * @return array
+     * Convert instance to array.
      */
     public function toArray(): array
     {
@@ -77,44 +47,42 @@ class Attribute implements ArrayAccess
     }
 
     /**
-     * Convert first value to a date object
+     * Convert the first value to a date object.
      *
-     * @return DateTimeImmutable
      * @throws InvalidMessageDateException
      */
-    public function toDate(): DateTimeImmutable
+    public function toDate(): \DateTimeImmutable
     {
         $date = $this->first();
-        if ($date instanceof DateTimeImmutable) {
+        if ($date instanceof \DateTimeImmutable) {
             return $date;
         }
 
         try {
-            return new DateTimeImmutable($date);
-        } catch (\Exception $e) {
-            throw new InvalidMessageDateException("Invalid date: $date", 0, $e);
+            return new \DateTimeImmutable($date);
+        } catch (\DateMalformedStringException $e) {
+            throw new InvalidMessageDateException("Invalid date: {$date}", 0, $e);
         }
     }
 
     /**
      * Determine if a value exists at an offset.
      *
-     * @param mixed $offset
-     * @return bool
+     * @param int|string $offset
      */
-    public function offsetExists($offset): bool
+    #[\Override]
+    public function offsetExists(mixed $offset): bool
     {
-        return array_key_exists($offset, $this->values);
+        return \array_key_exists($offset, $this->values);
     }
 
     /**
      * Get a value at a given offset.
      *
-     * @param mixed $offset
-     * @return mixed
+     * @param int|string $offset
      */
-    #[ReturnTypeWillChange]
-    public function offsetGet($offset)
+    #[\Override]
+    public function offsetGet(mixed $offset): mixed
     {
         return $this->values[$offset];
     }
@@ -122,14 +90,12 @@ class Attribute implements ArrayAccess
     /**
      * Set the value at a given offset.
      *
-     * @param mixed $offset
-     * @param mixed $value
-     * @return void
+     * @param null|int|string $offset
      */
-    #[ReturnTypeWillChange]
-    public function offsetSet($offset, $value)
+    #[\Override]
+    public function offsetSet(mixed $offset, mixed $value): void
     {
-        if (is_null($offset)) {
+        if (null === $offset) {
             $this->values[] = $value;
         } else {
             $this->values[$offset] = $value;
@@ -139,27 +105,24 @@ class Attribute implements ArrayAccess
     /**
      * Unset the value at a given offset.
      *
-     * @param string $offset
-     * @return void
+     * @param int|string $offset
      */
-    #[ReturnTypeWillChange]
-    public function offsetUnset($offset)
+    #[\Override]
+    public function offsetUnset(mixed $offset): void
     {
         unset($this->values[$offset]);
     }
 
     /**
-     * Add one or more values to the attribute
-     * @param array|mixed $value
-     * @param boolean $strict
-     *
-     * @return Attribute
+     * Add one or more values to the attribute.
      */
-    public function add($value, bool $strict = false): Attribute
+    public function add(mixed $value, bool $strict = false): self
     {
-        if (is_array($value)) {
+        if (\is_array($value)) {
             return $this->merge($value, $strict);
-        } elseif ($value !== null) {
+        }
+
+        if (null !== $value) {
             $this->attach($value, $strict);
         }
 
@@ -167,13 +130,11 @@ class Attribute implements ArrayAccess
     }
 
     /**
-     * Merge a given array of values with the current values array
-     * @param array $values
-     * @param boolean $strict
+     * Merge a given array of values with the current values array.
      *
-     * @return Attribute
+     * @return $this
      */
-    public function merge(array $values, bool $strict = false): Attribute
+    public function merge(array $values, bool $strict = false): self
     {
         foreach ($values as $value) {
             $this->attach($value, $strict);
@@ -183,110 +144,59 @@ class Attribute implements ArrayAccess
     }
 
     /**
-     * Check if the attribute contains the given value
-     * @param mixed $value
-     *
-     * @return bool
+     * Check if the attribute contains the given value.
      */
-    public function contains($value): bool
+    public function contains(mixed $value): bool
     {
-        return in_array($value, $this->values, true);
+        return \in_array($value, $this->values, true);
     }
 
     /**
-     * Attach a given value to the current value array
-     * @param $value
-     * @param bool $strict
+     * Attach a given value to the current value array.
      */
-    public function attach($value, bool $strict = false)
+    public function attach(mixed $value, bool $strict = false): void
     {
-        if ($strict === true) {
-            if ($this->contains($value) === false) {
-                $this->values[] = $value;
-            }
-        } else {
+        if (!$strict || !$this->contains($value)) {
             $this->values[] = $value;
         }
     }
 
     /**
-     * Set the attribute name
-     * @param $name
-     *
-     * @return Attribute
+     * Alias method for self::get().
      */
-    public function setName($name): Attribute
+    public function all(): array
     {
-        $this->name = $name;
+        reset($this->values);
 
-        return $this;
-    }
-
-    /**
-     * Get the attribute name
-     *
-     * @return string
-     */
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    /**
-     * Get all values
-     *
-     * @return array
-     */
-    public function get(): array
-    {
         return $this->values;
     }
 
     /**
-     * Alias method for self::get()
-     *
-     * @return array
+     * Get the first value if possible.
      */
-    public function all(): array
+    public function first(): mixed
     {
-        return $this->get();
+        return array_first($this->values);
     }
 
     /**
-     * Get the first value if possible
-     *
-     * @return mixed|null
+     * Get the last value if possible.
      */
-    public function first()
+    public function last(): mixed
     {
-        if ($this->offsetExists(0)) {
-            return $this->values[0];
-        }
-
-        return null;
+        return array_last($this->values);
     }
 
     /**
-     * Get the last value if possible
-     *
-     * @return mixed|null
-     */
-    public function last()
-    {
-        if (($cnt = $this->count()) > 0) {
-            return $this->values[$cnt - 1];
-        }
-
-        return null;
-    }
-
-    /**
-     * Get the number of values
-     *
-     * @return int
+     * Get the number of values.
      */
     public function count(): int
     {
         return count($this->values);
+    }
+
+    public function isEmpty(): bool
+    {
+        return [] === $this->values;
     }
 }

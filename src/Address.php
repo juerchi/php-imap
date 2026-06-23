@@ -1,4 +1,5 @@
 <?php
+
 /*
 * File:     Address.php
 * Category: -
@@ -13,42 +14,40 @@
 namespace Webklex\PHPIMAP;
 
 /**
- * Class Address
- *
- * @package Webklex\PHPIMAP
+ * Class Address.
  */
 class Address
 {
     /**
-     * Address attributes
+     * Address attributes.
      */
-    public string $personal = "";
-    public string $mailbox = "";
-    public string $host = "";
-    public string $mail = "";
-    public string $full = "";
+    public string $personal = '';
+    public string $mailbox = '';
+    public string $host = '';
+    public string $mail = '';
+    public string $full = '';
 
     public function __construct(object $object)
     {
-        if (property_exists($object, "personal")) {
+        if (property_exists($object, 'personal')) {
             $this->personal = $object->personal;
         }
-        if (property_exists($object, "mailbox")) {
+        if (property_exists($object, 'mailbox')) {
             $this->mailbox = $object->mailbox;
         }
-        if (property_exists($object, "host")) {
+        if (property_exists($object, 'host')) {
             $this->host = $object->host;
         }
-        if (property_exists($object, "mail")) {
+        if (property_exists($object, 'mail')) {
             $this->mail = $object->mail;
         }
-        if (property_exists($object, "full")) {
+        if (property_exists($object, 'full')) {
             $this->full = $object->full;
         }
     }
 
     /**
-     * Return the stringified address
+     * Return the stringified address.
      */
     public function __toString(): string
     {
@@ -56,21 +55,21 @@ class Address
     }
 
     /**
-     * Return the serialized address
+     * Return the serialized address.
      */
     public function __serialize(): array
     {
         return [
-            "personal" => $this->personal,
-            "mailbox" => $this->mailbox,
-            "host" => $this->host,
-            "mail" => $this->mail,
-            "full" => $this->full,
+            'personal' => $this->personal,
+            'mailbox' => $this->mailbox,
+            'host' => $this->host,
+            'mail' => $this->mail,
+            'full' => $this->full,
         ];
     }
 
     /**
-     * Convert instance to array
+     * Convert instance to array.
      */
     public function toArray(): array
     {
@@ -78,7 +77,7 @@ class Address
     }
 
     /**
-     * Return the stringified attribute
+     * Return the stringified attribute.
      */
     public function toString(): string
     {

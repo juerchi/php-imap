@@ -1,4 +1,5 @@
 <?php
+
 /*
 * File:     FolderMovedEvent.php
 * Category: Event
@@ -15,25 +16,12 @@ namespace Webklex\PHPIMAP\Events;
 use Webklex\PHPIMAP\Folder;
 
 /**
- * Class FolderMovedEvent
- *
- * @package Webklex\PHPIMAP\Events
+ * Class FolderMovedEvent.
  */
 class FolderMovedEvent extends Event
 {
-    /** @var Folder $old_folder */
-    public $old_folder;
-    /** @var Folder $new_folder */
-    public $new_folder;
-
-    /**
-     * Create a new event instance.
-     * @param Folder[] $folders
-     * @return void
-     */
-    public function __construct($folders)
-    {
-        $this->old_folder = $folders[0];
-        $this->new_folder = $folders[1];
-    }
+    public function __construct(
+        public readonly Folder $oldFolder,
+        public readonly Folder $newFolder,
+    ) {}
 }

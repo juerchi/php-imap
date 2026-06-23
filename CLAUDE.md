@@ -1,3 +1,10 @@
+# OpenWolf
+
+@.wolf/OPENWOLF.md
+
+This project uses OpenWolf for context management. Read and follow .wolf/OPENWOLF.md every session. Check .wolf/cerebrum.md before generating code. Check .wolf/anatomy.md before reading files.
+
+
 # CLAUDE.md
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
@@ -148,7 +155,7 @@ All protocols handle:
 ### Message Fetching Options
 - `FT_UID`: Fetch by UID (default, more stable)
 - `FT_PEEK`: Fetch without marking as read
-- Controlled via `fetch_options` parameter and config
+- Controlled via `fetchOptions` parameter and config
 
 ### Sequence Types
 - `ST_UID`: Use message UIDs (persistent)
@@ -224,5 +231,5 @@ $message->delete($expunge = true);
 - **Fetch Options**: Use `INF` (float) for "last message" in range fetches
 - **Boolean vs Int**:
   - `cert_validation` is stored as bool internally
-  - `fetch_body` and `fetch_flags` are bool, not int
+  - `fetchBody` and `fetchFlags` are bool, not int
 - **WhereQuery Values**: The `where()` method accepts mixed values (string, Carbon, int, arrays)

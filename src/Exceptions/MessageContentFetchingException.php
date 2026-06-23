@@ -1,4 +1,5 @@
 <?php
+
 /*
 * File:     MessageContentFetchingException.php
 * Category: Exception
@@ -12,13 +13,7 @@
 
 namespace Webklex\PHPIMAP\Exceptions;
 
-use Exception;
-
 /**
- * Class MessageContentFetchingException
- *
- * @package Webklex\PHPIMAP\Exceptions
+ * Class MessageContentFetchingException.
  */
-class MessageContentFetchingException extends Exception
-{
-}
+class MessageContentFetchingException extends \Exception {}

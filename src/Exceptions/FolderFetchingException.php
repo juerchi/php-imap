@@ -1,4 +1,5 @@
 <?php
+
 /*
 * File:     FolderFetchingException.php
 * Category: Exception
@@ -12,13 +13,7 @@
 
 namespace Webklex\PHPIMAP\Exceptions;
 
-use Exception;
-
 /**
- * Class FolderFetchingException
- *
- * @package Webklex\PHPIMAP\Exceptions
+ * Class FolderFetchingException.
  */
-class FolderFetchingException extends Exception
-{
-}
+class FolderFetchingException extends \Exception {}

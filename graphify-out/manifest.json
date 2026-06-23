@@ -1,0 +1,392 @@
+{
+  "/projects/php-imap/.claude/settings.local.json": {
+    "mtime": 1767864800.0538008,
+    "ast_hash": "cfbe276e7e4608fd4a3bdcc82c47a93e",
+    "semantic_hash": "cfbe276e7e4608fd4a3bdcc82c47a93e"
+  },
+  "/projects/php-imap/composer.json": {
+    "mtime": 1781856477.106816,
+    "ast_hash": "167d45206ca362eedef4c3f7e9b5345d",
+    "semantic_hash": "167d45206ca362eedef4c3f7e9b5345d"
+  },
+  "/projects/php-imap/examples/custom_attachment_mask.php": {
+    "mtime": 1767863533.0264204,
+    "ast_hash": "34c77ac73f3a271583e9dcc4da3ca3c3",
+    "semantic_hash": "34c77ac73f3a271583e9dcc4da3ca3c3"
+  },
+  "/projects/php-imap/examples/custom_message_mask.php": {
+    "mtime": 1742474702.1413538,
+    "ast_hash": "5b554af19009a8ff586f05fb47cd9d8a",
+    "semantic_hash": "5b554af19009a8ff586f05fb47cd9d8a"
+  },
+  "/projects/php-imap/examples/folder_structure.blade.php": {
+    "mtime": 1674634230.159175,
+    "ast_hash": "9604f14fa9b13b4d0cc2f6039d619e77",
+    "semantic_hash": "9604f14fa9b13b4d0cc2f6039d619e77"
+  },
+  "/projects/php-imap/examples/message_table.blade.php": {
+    "mtime": 1674634230.159175,
+    "ast_hash": "97f3915847f727c40116a2ba7ca3eb89",
+    "semantic_hash": "97f3915847f727c40116a2ba7ca3eb89"
+  },
+  "/projects/php-imap/rector.php": {
+    "mtime": 1742474702.145353,
+    "ast_hash": "d308d9289eba7274e907517ca81c61e0",
+    "semantic_hash": "d308d9289eba7274e907517ca81c61e0"
+  },
+  "/projects/php-imap/src/Address.php": {
+    "mtime": 1767871692.6214218,
+    "ast_hash": "da02a8d93f94b38ae06c1e5dc73cfca2",
+    "semantic_hash": "da02a8d93f94b38ae06c1e5dc73cfca2"
+  },
+  "/projects/php-imap/src/Attachment.php": {
+    "mtime": 1781774235.9473386,
+    "ast_hash": "5042ff375e3acd3e5c6ef11e0fb31f80",
+    "semantic_hash": "5042ff375e3acd3e5c6ef11e0fb31f80"
+  },
+  "/projects/php-imap/src/Attribute.php": {
+    "mtime": 1781856529.3310378,
+    "ast_hash": "799f04ead0fadcaf6b4e0a51ac57f2a7",
+    "semantic_hash": "799f04ead0fadcaf6b4e0a51ac57f2a7"
+  },
+  "/projects/php-imap/src/Client.php": {
+    "mtime": 1782118031.389715,
+    "ast_hash": "e131cc45fa229a6f0569906efdc9eda6",
+    "semantic_hash": "e131cc45fa229a6f0569906efdc9eda6"
+  },
+  "/projects/php-imap/src/ClientManager.php": {
+    "mtime": 1781707464.3819914,
+    "ast_hash": "de9df8c6048dff22d124d4afab4f9987",
+    "semantic_hash": "de9df8c6048dff22d124d4afab4f9987"
+  },
+  "/projects/php-imap/src/Connection/Protocols/AbstractProtocol.php": {
+    "mtime": 1782117906.5313873,
+    "ast_hash": "315c976bce23be3ca56ca282e9dbcb06",
+    "semantic_hash": "315c976bce23be3ca56ca282e9dbcb06"
+  },
+  "/projects/php-imap/src/Connection/Protocols/ImapProtocol.php": {
+    "mtime": 1782117815.1015139,
+    "ast_hash": "de7cd16b7d628173cd103bc9eede140c",
+    "semantic_hash": "de7cd16b7d628173cd103bc9eede140c"
+  },
+  "/projects/php-imap/src/Connection/Protocols/LegacyProtocol.php": {
+    "mtime": 1782118467.2505913,
+    "ast_hash": "cd8fc73b393348b014c48ff396db7c60",
+    "semantic_hash": "cd8fc73b393348b014c48ff396db7c60"
+  },
+  "/projects/php-imap/src/Connection/Protocols/ProtocolInterface.php": {
+    "mtime": 1782117770.2943861,
+    "ast_hash": "1fa64ca998cf6d382ec1636bc3ca0464",
+    "semantic_hash": "1fa64ca998cf6d382ec1636bc3ca0464"
+  },
+  "/projects/php-imap/src/DateParser.php": {
+    "mtime": 1782117345.8100643,
+    "ast_hash": "e2fba9cdfaf140aea91f9ab830d67d62",
+    "semantic_hash": "e2fba9cdfaf140aea91f9ab830d67d62"
+  },
+  "/projects/php-imap/src/EncodingAliases.php": {
+    "mtime": 1767871692.453423,
+    "ast_hash": "e823829dc4fd013b4ffe316dde8da800",
+    "semantic_hash": "e823829dc4fd013b4ffe316dde8da800"
+  },
+  "/projects/php-imap/src/Enums/Encryption.php": {
+    "mtime": 1781770499.0403602,
+    "ast_hash": "a6c6bf6926f999c5223ccbd2cf135bcc",
+    "semantic_hash": "a6c6bf6926f999c5223ccbd2cf135bcc"
+  },
+  "/projects/php-imap/src/Events/Event.php": {
+    "mtime": 1781696133.908553,
+    "ast_hash": "6081e74c74c3e9288d7a8e87f6f29c52",
+    "semantic_hash": "6081e74c74c3e9288d7a8e87f6f29c52"
+  },
+  "/projects/php-imap/src/Events/FlagDeletedEvent.php": {
+    "mtime": 1781699354.8255298,
+    "ast_hash": "4d89734928b7ac067dc29732f95d67c4",
+    "semantic_hash": "4d89734928b7ac067dc29732f95d67c4"
+  },
+  "/projects/php-imap/src/Events/FlagNewEvent.php": {
+    "mtime": 1767871692.5534222,
+    "ast_hash": "279125366b263fd465fe14e53aacb5df",
+    "semantic_hash": "279125366b263fd465fe14e53aacb5df"
+  },
+  "/projects/php-imap/src/Events/FolderDeletedEvent.php": {
+    "mtime": 1767871692.5494223,
+    "ast_hash": "ce65fa1256d360b9a68a4e6607bb1507",
+    "semantic_hash": "ce65fa1256d360b9a68a4e6607bb1507"
+  },
+  "/projects/php-imap/src/Events/FolderMovedEvent.php": {
+    "mtime": 1767871692.5614223,
+    "ast_hash": "d009dfb34513f12e952760017cf6aaca",
+    "semantic_hash": "d009dfb34513f12e952760017cf6aaca"
+  },
+  "/projects/php-imap/src/Events/FolderNewEvent.php": {
+    "mtime": 1767871692.5614223,
+    "ast_hash": "cf0ebe93c49d86bf192a0b999f924e48",
+    "semantic_hash": "cf0ebe93c49d86bf192a0b999f924e48"
+  },
+  "/projects/php-imap/src/Events/MessageCopiedEvent.php": {
+    "mtime": 1767871692.5534222,
+    "ast_hash": "646278147f6367d07e5e3313400694c6",
+    "semantic_hash": "646278147f6367d07e5e3313400694c6"
+  },
+  "/projects/php-imap/src/Events/MessageDeletedEvent.php": {
+    "mtime": 1767871692.5534222,
+    "ast_hash": "d68bc91827af108f41a806ec23613449",
+    "semantic_hash": "d68bc91827af108f41a806ec23613449"
+  },
+  "/projects/php-imap/src/Events/MessageMovedEvent.php": {
+    "mtime": 1767871692.5494223,
+    "ast_hash": "2b78fd603d89403a78b910ccc91939e5",
+    "semantic_hash": "2b78fd603d89403a78b910ccc91939e5"
+  },
+  "/projects/php-imap/src/Events/MessageNewEvent.php": {
+    "mtime": 1767871692.5534222,
+    "ast_hash": "eecc2731d4600432ffe9a5f142984e1c",
+    "semantic_hash": "eecc2731d4600432ffe9a5f142984e1c"
+  },
+  "/projects/php-imap/src/Events/MessageRestoredEvent.php": {
+    "mtime": 1767871692.5614223,
+    "ast_hash": "fbd6d52c7baef3293abbeaff210d424c",
+    "semantic_hash": "fbd6d52c7baef3293abbeaff210d424c"
+  },
+  "/projects/php-imap/src/Exceptions/AuthFailedException.php": {
+    "mtime": 1767871692.2174249,
+    "ast_hash": "593c77580abf45e4781e1c920352aa43",
+    "semantic_hash": "593c77580abf45e4781e1c920352aa43"
+  },
+  "/projects/php-imap/src/Exceptions/ConnectionFailedException.php": {
+    "mtime": 1767871692.2254248,
+    "ast_hash": "6e646c60564bf8a278de1e4ebff824e5",
+    "semantic_hash": "6e646c60564bf8a278de1e4ebff824e5"
+  },
+  "/projects/php-imap/src/Exceptions/EventNotFoundException.php": {
+    "mtime": 1767871692.2254248,
+    "ast_hash": "c3561b747ac27b4c035b5deb38605e72",
+    "semantic_hash": "c3561b747ac27b4c035b5deb38605e72"
+  },
+  "/projects/php-imap/src/Exceptions/FolderFetchingException.php": {
+    "mtime": 1767871692.2214248,
+    "ast_hash": "7467696a82aaf373c2e7758e9d642563",
+    "semantic_hash": "7467696a82aaf373c2e7758e9d642563"
+  },
+  "/projects/php-imap/src/Exceptions/GetMessagesFailedException.php": {
+    "mtime": 1767871692.2174249,
+    "ast_hash": "6bec4b5e639376e50367a7b54a795b59",
+    "semantic_hash": "6bec4b5e639376e50367a7b54a795b59"
+  },
+  "/projects/php-imap/src/Exceptions/InvalidMessageDateException.php": {
+    "mtime": 1767871692.2214248,
+    "ast_hash": "27053901278ce443264e6f70c088619b",
+    "semantic_hash": "27053901278ce443264e6f70c088619b"
+  },
+  "/projects/php-imap/src/Exceptions/InvalidWhereQueryCriteriaException.php": {
+    "mtime": 1767871692.2174249,
+    "ast_hash": "11e6b3bb7a3902c1f50ed6e12c38c55d",
+    "semantic_hash": "11e6b3bb7a3902c1f50ed6e12c38c55d"
+  },
+  "/projects/php-imap/src/Exceptions/MaskNotFoundException.php": {
+    "mtime": 1767871692.2254248,
+    "ast_hash": "b69b418b0d29f1d93ef088e4119c18e5",
+    "semantic_hash": "b69b418b0d29f1d93ef088e4119c18e5"
+  },
+  "/projects/php-imap/src/Exceptions/MessageContentFetchingException.php": {
+    "mtime": 1767871692.2294247,
+    "ast_hash": "700a3be1598092635a092a853745944d",
+    "semantic_hash": "700a3be1598092635a092a853745944d"
+  },
+  "/projects/php-imap/src/Exceptions/MessageFlagException.php": {
+    "mtime": 1767871692.2214248,
+    "ast_hash": "d27e5354faa7e56ee76330ab1b5923b7",
+    "semantic_hash": "d27e5354faa7e56ee76330ab1b5923b7"
+  },
+  "/projects/php-imap/src/Exceptions/MessageHeaderFetchingException.php": {
+    "mtime": 1767871692.2174249,
+    "ast_hash": "08f81352a91608c95251193c3738557c",
+    "semantic_hash": "08f81352a91608c95251193c3738557c"
+  },
+  "/projects/php-imap/src/Exceptions/MessageNotFoundException.php": {
+    "mtime": 1767871692.2254248,
+    "ast_hash": "3afc907de68db47d37d33284d46f7d08",
+    "semantic_hash": "3afc907de68db47d37d33284d46f7d08"
+  },
+  "/projects/php-imap/src/Exceptions/MessageSearchValidationException.php": {
+    "mtime": 1767871692.2174249,
+    "ast_hash": "573af70f7b596d080623e7a0e667b3ae",
+    "semantic_hash": "573af70f7b596d080623e7a0e667b3ae"
+  },
+  "/projects/php-imap/src/Exceptions/MessageSizeFetchingException.php": {
+    "mtime": 1781864434.2686207,
+    "ast_hash": "8510821b3096bf03af203c076b4f43cf",
+    "semantic_hash": "8510821b3096bf03af203c076b4f43cf"
+  },
+  "/projects/php-imap/src/Exceptions/MethodNotFoundException.php": {
+    "mtime": 1767871692.2174249,
+    "ast_hash": "13ea757cc89351103b4500be931d5115",
+    "semantic_hash": "13ea757cc89351103b4500be931d5115"
+  },
+  "/projects/php-imap/src/Exceptions/MethodNotSupportedException.php": {
+    "mtime": 1767871692.2174249,
+    "ast_hash": "f9f643e9cb13a5e13d254ab40f759858",
+    "semantic_hash": "f9f643e9cb13a5e13d254ab40f759858"
+  },
+  "/projects/php-imap/src/Exceptions/NotSupportedCapabilityException.php": {
+    "mtime": 1767871692.2214248,
+    "ast_hash": "b8de9b0effe5a7f1a5076ff7ffd271e3",
+    "semantic_hash": "b8de9b0effe5a7f1a5076ff7ffd271e3"
+  },
+  "/projects/php-imap/src/Exceptions/ProtocolNotSupportedException.php": {
+    "mtime": 1767871692.2214248,
+    "ast_hash": "e0a8d35c2816c641eb40e8b39ea34dbd",
+    "semantic_hash": "e0a8d35c2816c641eb40e8b39ea34dbd"
+  },
+  "/projects/php-imap/src/Exceptions/RuntimeException.php": {
+    "mtime": 1767871692.2174249,
+    "ast_hash": "6fcee61446fd541873a44a0e936cee45",
+    "semantic_hash": "6fcee61446fd541873a44a0e936cee45"
+  },
+  "/projects/php-imap/src/Folder.php": {
+    "mtime": 1782117724.3515878,
+    "ast_hash": "8a06863905bd6fb7536aca1938c9c897",
+    "semantic_hash": "8a06863905bd6fb7536aca1938c9c897"
+  },
+  "/projects/php-imap/src/Header.php": {
+    "mtime": 1781863749.422437,
+    "ast_hash": "2620fb1383afc641291b8198b735d27f",
+    "semantic_hash": "2620fb1383afc641291b8198b735d27f"
+  },
+  "/projects/php-imap/src/IMAP.php": {
+    "mtime": 1781765768.09719,
+    "ast_hash": "eaa9875fe29bb51a60c857b86e00f498",
+    "semantic_hash": "eaa9875fe29bb51a60c857b86e00f498"
+  },
+  "/projects/php-imap/src/Message.php": {
+    "mtime": 1781864800.7157605,
+    "ast_hash": "b78a13b7999ec9c153f48b174cc36125",
+    "semantic_hash": "b78a13b7999ec9c153f48b174cc36125"
+  },
+  "/projects/php-imap/src/Part.php": {
+    "mtime": 1782117668.9680834,
+    "ast_hash": "4f6f341ff1af4c3028819b12a119c2da",
+    "semantic_hash": "4f6f341ff1af4c3028819b12a119c2da"
+  },
+  "/projects/php-imap/src/Query/Query.php": {
+    "mtime": 1781700988.55727,
+    "ast_hash": "2056b65f028f2a682e63e0fb6b7fde89",
+    "semantic_hash": "2056b65f028f2a682e63e0fb6b7fde89"
+  },
+  "/projects/php-imap/src/Query/WhereQuery.php": {
+    "mtime": 1781688493.8042002,
+    "ast_hash": "b79918e50eb7f8359e69d0210cfbd121",
+    "semantic_hash": "b79918e50eb7f8359e69d0210cfbd121"
+  },
+  "/projects/php-imap/src/Structure.php": {
+    "mtime": 1781783792.1010711,
+    "ast_hash": "79ad7bc7727a3a72ec268fdb66faad1e",
+    "semantic_hash": "79ad7bc7727a3a72ec268fdb66faad1e"
+  },
+  "/projects/php-imap/src/Support/AttachmentCollection.php": {
+    "mtime": 1781699744.7670517,
+    "ast_hash": "8c64ecf90220655153fb092fb564b664",
+    "semantic_hash": "8c64ecf90220655153fb092fb564b664"
+  },
+  "/projects/php-imap/src/Support/FlagCollection.php": {
+    "mtime": 1781699744.7510517,
+    "ast_hash": "74bf26909d487c11c0518664979ca659",
+    "semantic_hash": "74bf26909d487c11c0518664979ca659"
+  },
+  "/projects/php-imap/src/Support/FolderCollection.php": {
+    "mtime": 1781699704.1229417,
+    "ast_hash": "03d4595ba36fffaac53e6ede186f9e00",
+    "semantic_hash": "03d4595ba36fffaac53e6ede186f9e00"
+  },
+  "/projects/php-imap/src/Support/Masks/AttachmentMask.php": {
+    "mtime": 1781684009.9046192,
+    "ast_hash": "894da26f85c3458dab9a8f6590ed3595",
+    "semantic_hash": "894da26f85c3458dab9a8f6590ed3595"
+  },
+  "/projects/php-imap/src/Support/Masks/Mask.php": {
+    "mtime": 1781684105.3884902,
+    "ast_hash": "f14bc43bd91246b9605177f8307e8eec",
+    "semantic_hash": "f14bc43bd91246b9605177f8307e8eec"
+  },
+  "/projects/php-imap/src/Support/Masks/MessageMask.php": {
+    "mtime": 1781701406.3661296,
+    "ast_hash": "3e0e8a4df76f143dce21065ea7225dde",
+    "semantic_hash": "3e0e8a4df76f143dce21065ea7225dde"
+  },
+  "/projects/php-imap/src/Support/MessageCollection.php": {
+    "mtime": 1781699656.2428002,
+    "ast_hash": "ed2cf5f8feb7e9ad3ce488f18f1cfdda",
+    "semantic_hash": "ed2cf5f8feb7e9ad3ce488f18f1cfdda"
+  },
+  "/projects/php-imap/src/Traits/HasEvents.php": {
+    "mtime": 1781693323.5897036,
+    "ast_hash": "417fe07fd17b2b3d6c3614b4fbc2e87f",
+    "semantic_hash": "417fe07fd17b2b3d6c3614b4fbc2e87f"
+  },
+  "/projects/php-imap/src/config/imap.php": {
+    "mtime": 1767874135.3518105,
+    "ast_hash": "4548da37c58296692249fe047c1b43ea",
+    "semantic_hash": "4548da37c58296692249fe047c1b43ea"
+  },
+  "/projects/php-imap/tests/InitialTest.php": {
+    "mtime": 1767874916.0096347,
+    "ast_hash": "49f885f13c973fca5c492dd80c38be77",
+    "semantic_hash": "49f885f13c973fca5c492dd80c38be77"
+  },
+  "/projects/php-imap/.github/FUNDING.yml": {
+    "mtime": 1674634230.159175,
+    "ast_hash": "9ed964c51a69f1fd83258fa396309b54",
+    "semantic_hash": "9ed964c51a69f1fd83258fa396309b54"
+  },
+  "/projects/php-imap/.github/ISSUE_TEMPLATE/bug_report.md": {
+    "mtime": 1674634230.159175,
+    "ast_hash": "a2f243eff7d0a988868452e07905eabe",
+    "semantic_hash": "a2f243eff7d0a988868452e07905eabe"
+  },
+  "/projects/php-imap/.github/ISSUE_TEMPLATE/feature_request.md": {
+    "mtime": 1674634230.159175,
+    "ast_hash": "ed2255072a8baff5cc6ef57448dcffc8",
+    "semantic_hash": "ed2255072a8baff5cc6ef57448dcffc8"
+  },
+  "/projects/php-imap/.github/ISSUE_TEMPLATE/general-help-request.md": {
+    "mtime": 1674634230.159175,
+    "ast_hash": "57858a8f006bcb4895794eb37f2abe9c",
+    "semantic_hash": "57858a8f006bcb4895794eb37f2abe9c"
+  },
+  "/projects/php-imap/.travis.yml": {
+    "mtime": 1742474702.1413538,
+    "ast_hash": "8326b61d8be4245c0d2504c4e4bb284e",
+    "semantic_hash": "8326b61d8be4245c0d2504c4e4bb284e"
+  },
+  "/projects/php-imap/CHANGELOG.md": {
+    "mtime": 1742474702.1413538,
+    "ast_hash": "35bf87ce430d5b754c603dd3094fc664",
+    "semantic_hash": "35bf87ce430d5b754c603dd3094fc664"
+  },
+  "/projects/php-imap/CLAUDE.md": {
+    "mtime": 1767871296.3613484,
+    "ast_hash": "78c31a19f8bc84166ceb85f9d2f09889",
+    "semantic_hash": "78c31a19f8bc84166ceb85f9d2f09889"
+  },
+  "/projects/php-imap/CODE_OF_CONDUCT.md": {
+    "mtime": 1674634230.159175,
+    "ast_hash": "cc9d670f7175e58f42b371f6278335f2",
+    "semantic_hash": "cc9d670f7175e58f42b371f6278335f2"
+  },
+  "/projects/php-imap/LICENSE.md": {
+    "mtime": 1674634230.159175,
+    "ast_hash": "752705353990501383a9c65dfbc9f620",
+    "semantic_hash": "752705353990501383a9c65dfbc9f620"
+  },
+  "/projects/php-imap/README.md": {
+    "mtime": 1742474702.1413538,
+    "ast_hash": "b4d2faedc6b14eb56d5ba843c33e1f26",
+    "semantic_hash": "b4d2faedc6b14eb56d5ba843c33e1f26"
+  },
+  "/projects/php-imap/_config.yml": {
+    "mtime": 1733821460.401599,
+    "ast_hash": "d178df8a46be3ea7f599296e24430ce0",
+    "semantic_hash": "d178df8a46be3ea7f599296e24430ce0"
+  }
+}

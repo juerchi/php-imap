@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 /*
 * File:     AttachmentCollection.php
 * Category: Collection
@@ -12,11 +15,12 @@
 
 namespace Webklex\PHPIMAP\Support;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Webklex\PHPIMAP\Attachment;
+
 /**
- * Class AttachmentCollection
+ * Class AttachmentCollection.
  *
- * @package Webklex\PHPIMAP\Support
+ * @template-extends ArrayCollection<string|int, Attachment>
  */
-class AttachmentCollection extends PaginatedCollection
-{
-}
+class AttachmentCollection extends ArrayCollection {}

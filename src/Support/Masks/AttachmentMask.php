@@ -1,4 +1,5 @@
 <?php
+
 /*
 * File: AttachmentMask.php
 * Category: Mask
@@ -14,33 +15,24 @@ namespace Webklex\PHPIMAP\Support\Masks;
 
 use Webklex\PHPIMAP\Attachment;
 
-/**
- * Class AttachmentMask
- *
- * @package Webklex\PHPIMAP\Support\Masks
- */
 class AttachmentMask extends Mask
 {
-    /** @var Attachment $parent */
-    protected $parent;
+    /** @var Attachment */
+    protected object $parent;
 
     /**
-     * Get the attachment content base64 encoded
-     *
-     * @return string|null
+     * Get the attachment content base64 encoded.
      */
-    public function getContentBase64Encoded()
+    public function getContentBase64Encoded(): ?string
     {
         return base64_encode($this->parent->content);
     }
 
     /**
-     * Get a base64 image src string
-     *
-     * @return string|null
+     * Get a base64 image src string.
      */
-    public function getImageSrc()
+    public function getImageSrc(): ?string
     {
-        return 'data:'.$this->parent->content_type.';base64,'.$this->getContentBase64Encoded();
+        return 'data:'.$this->parent->contentType.';base64,'.$this->getContentBase64Encoded();
     }
 }

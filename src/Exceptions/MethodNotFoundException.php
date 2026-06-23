@@ -1,4 +1,5 @@
 <?php
+
 /*
 * File:     MethodNotFoundException.php
 * Category: Exception
@@ -12,13 +13,7 @@
 
 namespace Webklex\PHPIMAP\Exceptions;
 
-use Exception;
-
 /**
- * Class MethodNotFoundException
- *
- * @package Webklex\PHPIMAP\Exceptions
+ * Class MethodNotFoundException.
  */
-class MethodNotFoundException extends Exception
-{
-}
+class MethodNotFoundException extends \Exception {}

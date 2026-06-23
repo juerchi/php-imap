@@ -1,4 +1,5 @@
 <?php
+
 /*
 * File:     RuntimeException.php
 * Category: Exception
@@ -12,13 +13,7 @@
 
 namespace Webklex\PHPIMAP\Exceptions;
 
-use Exception;
-
 /**
- * Class RuntimeException
- *
- * @package Webklex\PHPIMAP\Exceptions
+ * Class RuntimeException.
  */
-class RuntimeException extends Exception
-{
-}
+class RuntimeException extends \Exception {}

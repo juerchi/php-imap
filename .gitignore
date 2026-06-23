@@ -1,4 +1,7 @@
 vendor
 composer.lock
 .idea
+.phpunit.cache
+.php-cs-fixer.cache
+graphify-out/cache
 /build/

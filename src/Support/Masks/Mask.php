@@ -1,4 +1,5 @@
 <?php
+
 /*
 * File: Mask.php
 * Category: Mask
@@ -12,38 +13,18 @@
 
 namespace Webklex\PHPIMAP\Support\Masks;
 
-use Illuminate\Support\Str;
+use Symfony\Component\String\UnicodeString;
 use Webklex\PHPIMAP\Exceptions\MethodNotFoundException;
 
-/**
- * Class Mask
- *
- * @package Webklex\PHPIMAP\Support\Masks
- */
 class Mask
 {
     /**
-     * Available attributes
-     *
-     * @var array $attributes
+     * Available attributes.
      */
-    protected $attributes = [];
+    protected array $attributes = [];
 
-    /**
-     * Parent instance
-     *
-     * @var object $parent
-     */
-    protected $parent;
-
-    /**
-     * Mask constructor.
-     * @param $parent
-     */
-    public function __construct($parent)
+    public function __construct(protected object $parent)
     {
-        $this->parent = $parent;
-
         if (method_exists($this->parent, 'getAttributes')) {
             $this->attributes = array_merge($this->attributes, $this->parent->getAttributes());
         }
@@ -52,30 +33,20 @@ class Mask
     }
 
     /**
-     * Boot method made to be used by any custom mask
-     */
-    protected function boot()
-    {
-    }
-
-    /**
-     * Call dynamic attribute setter and getter methods and inherit the parent calls
-     * @param string $method
-     * @param array $arguments
+     * Call dynamic attribute setter and getter methods and inherit the parent calls.
      *
-     * @return mixed
      * @throws MethodNotFoundException
      */
-    public function __call(string $method, array $arguments)
+    public function __call(string $method, array $arguments): mixed
     {
-        if (strtolower(substr($method, 0, 3)) === 'get') {
-            $name = Str::snake(substr($method, 3));
+        if (0 === stripos($method, 'get')) {
+            $name = new UnicodeString(substr($method, 3))->snake()->toString();
 
             if (isset($this->attributes[$name])) {
                 return $this->attributes[$name];
             }
-        } elseif (strtolower(substr($method, 0, 3)) === 'set') {
-            $name = Str::snake(substr($method, 3));
+        } elseif (0 === stripos($method, 'set')) {
+            $name = new UnicodeString(substr($method, 3))->snake()->toString();
 
             if (isset($this->attributes[$name])) {
                 $this->attributes[$name] = array_pop($arguments);
@@ -84,57 +55,38 @@ class Mask
             }
         }
 
-        if (method_exists($this->parent, $method) === true) {
+        if (true === method_exists($this->parent, $method)) {
             return call_user_func_array([$this->parent, $method], $arguments);
         }
 
-        throw new MethodNotFoundException("Method ".self::class.'::'.$method.'() is not supported');
+        throw new MethodNotFoundException('Method '.self::class.'::'.$method.'() is not supported');
     }
 
-    /**
-     * Magic setter
-     * @param $name
-     * @param $value
-     *
-     * @return void
-     */
-    public function __set($name, $value): void
+    public function __set(mixed $name, mixed $value): void
     {
         $this->attributes[$name] = $value;
     }
 
-    /**
-     * Magic getter
-     * @param $name
-     *
-     * @return mixed|null
-     */
-    public function __get($name)
+    public function __get(mixed $name): mixed
     {
-        if (isset($this->attributes[$name])) {
-            return $this->attributes[$name];
-        }
-
-        return null;
+        return $this->attributes[$name] ?? null;
     }
 
-    /**
-     * Get the parent instance
-     *
-     * @return object
-     */
-    public function getParent()
+    public function getParent(): object
     {
         return $this->parent;
     }
 
     /**
-     * Get all available attributes
-     *
-     * @return array
+     * Get all available attributes.
      */
     public function getAttributes(): array
     {
         return $this->attributes;
     }
+
+    /**
+     * Boot method made to be used by any custom mask.
+     */
+    protected function boot(): void {}
 }

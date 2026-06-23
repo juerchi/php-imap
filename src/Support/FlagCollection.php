@@ -1,4 +1,5 @@
 <?php
+
 /*
 * File:     FlagCollection.php
 * Category: Collection
@@ -12,11 +13,9 @@
 
 namespace Webklex\PHPIMAP\Support;
 
+use Doctrine\Common\Collections\ArrayCollection;
+
 /**
- * Class FlagCollection
- *
- * @package Webklex\PHPIMAP\Support
+ * Class FlagCollection.
  */
-class FlagCollection extends PaginatedCollection
-{
-}
+final class FlagCollection extends ArrayCollection {}

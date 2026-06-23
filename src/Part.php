@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 /*
 * File: Part.php
 * Category: -
@@ -15,153 +18,137 @@ namespace Webklex\PHPIMAP;
 use Webklex\PHPIMAP\Exceptions\InvalidMessageDateException;
 
 /**
- * Class Part
- *
- * @package Webklex\PHPIMAP
+ * Class Part.
  */
-class Part
+final class Part
 {
     /**
-     * Raw part
-     *
-     * @var string $raw
+     * Raw part.
      */
-    public $raw = "";
+    public string $raw = '';
 
     /**
-     * Part type
-     *
-     * @var int $type
+     * Part type.
      */
-    public $type = IMAP::MESSAGE_TYPE_TEXT;
+    public int $type = IMAP::MESSAGE_TYPE_TEXT;
 
     /**
-     * Part content
-     *
-     * @var string $content
+     * Part content.
      */
-    public $content = "";
+    public string $content = '';
 
     /**
-     * Part subtype
-     *
-     * @var string $subtype
+     * Part subtype.
      */
-    public $subtype = null;
+    public ?string $subtype = null;
 
     /**
-     * Part charset - if available
-     *
-     * @var string $charset
+     * Part charset - if available.
      */
-    public $charset = "utf-8";
+    public string $charset = 'utf-8';
 
     /**
-     * Part encoding method
-     *
-     * @var int $encoding
+     * Part encoding method.
      */
-    public $encoding = IMAP::MESSAGE_ENC_OTHER;
+    public int $encoding = IMAP::MESSAGE_ENC_OTHER;
 
     /**
-     * Alias to check if the part is an attachment
-     *
-     * @var boolean $ifdisposition
+     * Alias to check if the part is an attachment.
      */
-    public $ifdisposition = false;
+    public bool $ifdisposition = false;
 
     /**
-     * Indicates if the part is an attachment
-     *
-     * @var string $disposition
+     * Indicates if the part is an attachment.
      */
-    public $disposition = null;
+    public ?string $disposition = null;
 
     /**
-     * Alias to check if the part has a description
-     *
-     * @var boolean $ifdescription
+     * Alias to check if the part has a description.
      */
-    public $ifdescription = false;
+    public bool $ifdescription = false;
 
     /**
-     * Part description if available
-     *
-     * @var string $description
+     * Part description if available.
      */
-    public $description = null;
+    public ?string $description = null;
 
     /**
-     * Part filename if available
-     *
-     * @var string $filename
+     * Part filename if available.
      */
-    public $filename = null;
+    public ?string $filename = null;
 
     /**
-     * Part name if available
-     *
-     * @var string $name
+     * Part name if available.
      */
-    public $name = null;
+    public ?string $name = null;
 
     /**
-     * Part id if available
-     *
-     * @var string $id
+     * Part id if available.
      */
-    public $id = null;
+    public ?string $id = null;
 
     /**
-     * The part number of the current part
-     *
-     * @var integer $part_number
+     * The part number of the current part.
      */
-    public $part_number = 0;
+    public int $partNumber = 0;
 
     /**
-     * Part length in bytes
-     *
-     * @var integer $bytes
+     * Part length in bytes.
      */
-    public $bytes = null;
+    public int $bytes;
 
     /**
-     * Part content type
-     *
-     * @var string|null $content_type
+     * Part content type.
      */
-    public $content_type = null;
+    public ?string $contentType = null;
+
+    private ?Header $header = null;
 
     /**
-     * @var Header $header
-     */
-    private $header = null;
-
-    /**
-     * Part constructor.
-     * @param $raw_part
-     * @param Header|null $header
-     * @param integer $part_number
-     *
      * @throws InvalidMessageDateException
      */
-    public function __construct($raw_part, ?Header $header = null, int $part_number = 0)
+    public function __construct(string $rawPart, ?Header $header = null, int $partNumber = 0)
     {
-        $this->raw = $raw_part;
+        $this->raw = $rawPart;
         $this->header = $header;
-        $this->part_number = $part_number;
+        $this->partNumber = $partNumber;
         $this->parse();
     }
 
     /**
-     * Parse the raw parts
+     * Check if the current part represents an attachment.
+     */
+    public function isAttachment(): bool
+    {
+        $validDisposition = in_array(
+            strtolower($this->disposition ?? ''),
+            ClientManager::get('options.dispositions'),
+            true
+        );
+
+        if (
+            IMAP::MESSAGE_TYPE_TEXT === $this->type
+            && (!$this->ifdisposition || empty($this->disposition) || !$validDisposition)) {
+            if ((null === $this->subtype || in_array(
+                strtolower($this->subtype),
+                ['plain', 'html'],
+                true
+            )) && null === $this->filename && null === $this->name) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Parse the raw parts.
      *
      * @throws InvalidMessageDateException
      */
-    protected function parse()
+    private function parse(): void
     {
-        if ($this->header === null) {
+        if (null === $this->header) {
             $body = $this->findHeaders();
         } else {
             $body = $this->raw;
@@ -171,45 +158,36 @@ class Part
         $this->parseDescription();
         $this->parseEncoding();
 
-        $this->charset = $this->header->get("charset");
-        $this->name = $this->header->get("name");
-        $this->filename = $this->header->get("filename");
+        $this->charset = $this->header->get('charset')->first() ?? 'utf-8';
+        $this->name = (string) $this->header->get('name');
+        $this->filename = (string) $this->header->get('filename');
 
-        if (!empty($this->header->get("id"))) {
-            $this->id = $this->header->get("id");
-        } else {
-            if (!empty($this->header->get("x_attachment_id"))) {
-                $this->id = $this->header->get("x_attachment_id");
-            } else {
-                if (!empty($this->header->get("content_id"))) {
-                    $this->id = strtr($this->header->get("content_id"), [
-                        '<' => '',
-                        '>' => '',
-                    ]);
-                }
-            }
+        if (!$this->header->get('id')->isEmpty()) {
+            $this->id = (string) $this->header->get('id');
+        } elseif (!$this->header->get('x_attachment_id')->isEmpty()) {
+            $this->id = (string) $this->header->get('x_attachment_id');
+        } elseif (!$this->header->get('content_id')->isEmpty()) {
+            $this->id = strtr(
+                (string) $this->header->get('content_id'),
+                ['<' => '', '>' => '']
+            );
         }
 
-        $content_types = $this->header->get("content_type");
-        if (!empty($content_types)) {
-            $this->subtype = $this->parseSubtype($content_types);
-            $content_type = $content_types;
-            if (is_array($content_types)) {
-                $content_type = $content_types[0];
-            }
-            $parts = explode(';', $content_type);
-            $this->content_type = trim($parts[0]);
+        $contentTypes = $this->header->get('contentType')->all();
+        if ([] !== $contentTypes) {
+            $this->subtype = $this->parseSubtype($contentTypes);
+            $contentType = $contentTypes[0];
+            $parts = explode(';', $contentType);
+            $this->contentType = trim($parts[0]);
         }
-
 
         $this->content = trim(rtrim($body));
         $this->bytes = strlen($this->content);
     }
 
     /**
-     * Find all available headers and return the leftover body segment
+     * Find all available headers and return the leftover body segment.
      *
-     * @return string
      * @throws InvalidMessageDateException
      */
     private function findHeaders(): string
@@ -218,7 +196,7 @@ class Part
         while (($pos = strpos($body, "\r\n")) > 0) {
             $body = substr($body, $pos + 2);
         }
-        $headers = substr($this->raw, 0, strlen($body) * -1);
+        $headers = substr($this->raw, 0, -strlen($body));
         $body = substr($body, 0, -2);
 
         $this->header = new Header($headers);
@@ -227,105 +205,71 @@ class Part
     }
 
     /**
-     * Try to parse the subtype if any is present
-     * @param $content_type
+     * Try to parse the subtype if any is present.
      *
-     * @return string|null
+     * @param string|string[] $contentType
      */
-    private function parseSubtype($content_type): ?string
+    private function parseSubtype(array|string $contentType): ?string
     {
-        if (is_array($content_type)) {
-            foreach ($content_type as $part) {
-                if ((strpos($part, "/")) !== false) {
+        if (is_array($contentType)) {
+            foreach ($contentType as $part) {
+                $pos = strpos($part, '/');
+                if (false !== $pos) {
                     return $this->parseSubtype($part);
                 }
             }
 
             return null;
         }
-        if (($pos = strpos($content_type, "/")) !== false) {
-            return substr($content_type, $pos + 1);
+        $pos = strpos($contentType, '/');
+        if (false !== $pos) {
+            return substr($contentType, $pos + 1);
         }
 
         return null;
     }
 
     /**
-     * Try to parse the disposition if any is present
+     * Try to parse the disposition if any is present.
      */
-    private function parseDisposition()
+    private function parseDisposition(): void
     {
-        $content_disposition = $this->header->get("content_disposition");
-        if ($content_disposition !== null) {
+        $contentDisposition = $this->header->get('content_disposition')->first();
+        if (null !== $contentDisposition) {
             $this->ifdisposition = true;
-            $this->disposition = (is_array($content_disposition)) ? implode(
-                ' ',
-                $content_disposition
-            ) : $content_disposition;
+            $this->disposition = (is_array($contentDisposition))
+                    ? implode(' ', $contentDisposition)
+                    : explode(';', $contentDisposition)[0];
         }
     }
 
     /**
-     * Try to parse the description if any is present
+     * Try to parse the description if any is present.
      */
-    private function parseDescription()
+    private function parseDescription(): void
     {
-        $content_description = $this->header->get("content_description");
-        if ($content_description !== null) {
+        $contentDescription = $this->header->get('content_description')->first();
+        if (null !== $contentDescription) {
             $this->ifdescription = true;
-            $this->description = $content_description;
+            $this->description = $contentDescription;
         }
     }
 
     /**
-     * Try to parse the encoding if any is present
+     * Try to parse the encoding if any is present.
      */
-    private function parseEncoding()
+    private function parseEncoding(): void
     {
-        $encoding = $this->header->get("content_transfer_encoding");
-        if ($encoding !== null) {
-            switch (strtolower($encoding)) {
-                case "quoted-printable":
-                    $this->encoding = IMAP::MESSAGE_ENC_QUOTED_PRINTABLE;
-                    break;
-                case "base64":
-                    $this->encoding = IMAP::MESSAGE_ENC_BASE64;
-                    break;
-                case "7bit":
-                    $this->encoding = IMAP::MESSAGE_ENC_7BIT;
-                    break;
-                case "8bit":
-                    $this->encoding = IMAP::MESSAGE_ENC_8BIT;
-                    break;
-                case "binary":
-                    $this->encoding = IMAP::MESSAGE_ENC_BINARY;
-                    break;
-                default:
-                    $this->encoding = IMAP::MESSAGE_ENC_OTHER;
-                    break;
-
-            }
+        $encoding = $this->header->get('content_transfer_encoding')->first();
+        if (null !== $encoding) {
+            $this->encoding = match (strtolower($encoding)) {
+                'quoted-printable' => IMAP::MESSAGE_ENC_QUOTED_PRINTABLE,
+                'base64' => IMAP::MESSAGE_ENC_BASE64,
+                '7bit' => IMAP::MESSAGE_ENC_7BIT,
+                '8bit' => IMAP::MESSAGE_ENC_8BIT,
+                'binary' => IMAP::MESSAGE_ENC_BINARY,
+                default => IMAP::MESSAGE_ENC_OTHER,
+            };
         }
-    }
-
-    /**
-     * Check if the current part represents an attachment
-     *
-     * @return bool
-     */
-    public function isAttachment(): bool
-    {
-        $valid_disposition = in_array(strtolower($this->disposition ?? ''), ClientManager::get('options.dispositions'));
-
-        if ($this->type == IMAP::MESSAGE_TYPE_TEXT && ($this->ifdisposition == 0 || empty($this->disposition) || !$valid_disposition)) {
-            if (($this->subtype == null || in_array(
-                (strtolower($this->subtype)),
-                ["plain", "html"]
-            )) && $this->filename == null && $this->name == null) {
-                return false;
-            }
-        }
-
-        return true;
     }
 }

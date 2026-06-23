@@ -1,4 +1,5 @@
 <?php
+
 /*
 * File: ImapProtocol.php
 * Category: Protocol
@@ -13,53 +14,57 @@
 namespace Webklex\PHPIMAP\Connection\Protocols;
 
 use Psr\Log\LoggerInterface;
+use Webklex\PHPIMAP\Enums\Encryption;
 use Webklex\PHPIMAP\Exceptions\ConnectionFailedException;
+use Webklex\PHPIMAP\Exceptions\RuntimeException;
 use Webklex\PHPIMAP\IMAP;
 
 /**
- * Class Protocol
+ * Class AbstractProtocol.
  *
- * @package Webklex\PHPIMAP\Connection\Protocols
+ * @phpstan-import-type ImapUid from ProtocolInterface
  */
 abstract class AbstractProtocol implements ProtocolInterface
 {
-    /**
-     * Default connection timeout in seconds
-     */
-    protected $connection_timeout = 30;
+    public const int DEFAULT_CONNECTION_TIMEOUT = 30;
 
     /**
-     * @var boolean
+     * Default connection timeout in seconds.
      */
-    protected $debug = false;
+    public int $connectionTimeout = self::DEFAULT_CONNECTION_TIMEOUT {
+        set(?int $value) {
+            $this->connectionTimeout = $value ?? self::DEFAULT_CONNECTION_TIMEOUT;
+        }
+    }
+
+    public ?Encryption $encryption = null;
 
     /**
-     * @var boolean
+     * Set to false to ignore SSL certificate validation.
      */
-    protected $enable_uid_cache = true;
+    public bool $certValidation = true;
+
+    public ?LoggerInterface $logger = null {
+        set {
+            $this->logger = $value;
+        }
+    }
 
     /**
-     * @var false|\IMAP\Connection|resource
+     * Get an available cryptographic method.
      */
-    public $stream = false;
+    public int $cryptoMethod {
+        get => \STREAM_CRYPTO_METHOD_TLS_CLIENT;
+    }
+
+    protected bool $enableUidCache = true;
+
+    protected bool $debug = false;
 
     /**
-     * Connection encryption method
-     * @var mixed $encryption
+     * Proxy settings.
      */
-    protected $encryption = false;
-
-    /**
-     * Set to false to ignore SSL certificate validation
-     * @var bool
-     */
-    protected $cert_validation = true;
-
-    /**
-     * Proxy settings
-     * @var array
-     */
-    protected $proxy = [
+    protected array $proxy = [
         'socket' => null,
         'request_fulluri' => false,
         'username' => null,
@@ -67,151 +72,154 @@ abstract class AbstractProtocol implements ProtocolInterface
     ];
 
     /**
-     * Cache for uid of active folder.
+     * Cache for messageNumber => uid of the active folder.
+     *
+     * @var null|array<int, ImapUid>
      */
-    protected ?array $uid_cache = null;
-
-    protected ?LoggerInterface $logger = null;
-
-    public function setLogger(?LoggerInterface $logger): void
-    {
-        $this->logger = $logger;
-    }
+    protected ?array $uidCache = null;
 
     /**
-     * Get an available cryptographic method
-     */
-    public function getCryptoMethod(): int
-    {
-        // Allow the best TLS version(s) we can
-        $cryptoMethod = STREAM_CRYPTO_METHOD_TLS_CLIENT;
-
-        // PHP 5.6.7 dropped inclusion of TLS 1.1 and 1.2 in STREAM_CRYPTO_METHOD_TLS_CLIENT
-        // so add them back in manually if we can
-        if (defined('STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT')) {
-            $cryptoMethod = STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT;
-        } elseif (defined('STREAM_CRYPTO_METHOD_TLSv1_1_CLIENT')) {
-            $cryptoMethod = STREAM_CRYPTO_METHOD_TLSv1_1_CLIENT;
-        }
-
-        return $cryptoMethod;
-    }
-
-    /**
-     * Enable SSL certificate validation
+     * Enable SSL certificate validation.
      *
      * @return $this
      */
-    public function enableCertValidation()
+    public function enableCertValidation(): static
     {
-        $this->cert_validation = true;
+        $this->certValidation = true;
 
         return $this;
     }
 
     /**
-     * Disable SSL certificate validation
-     * @return $this
-     */
-    public function disableCertValidation()
-    {
-        $this->cert_validation = false;
-
-        return $this;
-    }
-
-    /**
-     * Set SSL certificate validation
-     * @param bool $cert_validation
-     * @return $this
-     */
-    public function setCertValidation($cert_validation)
-    {
-        $this->cert_validation = $cert_validation;
-
-        return $this;
-    }
-
-    /**
-     * Should we validate SSL certificate?
+     * Disable SSL certificate validation.
      *
-     * @return bool
+     * @return $this
      */
-    public function getCertValidation()
+    public function disableCertValidation(): static
     {
-        return $this->cert_validation;
+        $this->certValidation = false;
+
+        return $this;
     }
 
     /**
-     * Set connection proxy settings
-     * @param array $options
+     * Set connection proxy settings.
+     *
+     * @param array{socket?: null|string, request_fulluri?: bool, username?: null|string, password?: null|string} $options
+     *
      * @return $this
      */
-    public function setProxy($options)
+    public function setProxy(array $options): static
     {
         foreach ($this->proxy as $key => $val) {
-            if (isset($options[$key])) {
-                $this->proxy[$key] = $options[$key];
-            }
+            $this->proxy[$key] = $options[$key] ?? $val;
         }
 
         return $this;
     }
 
     /**
-     * Get the current proxy settings
+     * Get the current proxy settings.
      *
-     * @return array
+     * @return array{socket: null|string, request_fulluri: bool, username: null|string, password: null|string}
      */
-    public function getProxy()
+    public function getProxy(): array
     {
         return $this->proxy;
     }
 
     /**
-     * Prepare socket options
-     * @param string $transport
-     * @return array
+     * Get the UID key string.
      */
-    private function defaultSocketOptions($transport)
+    public function getUIDKey(int|string $uid): string
     {
-        $options = [];
-        if ($this->encryption != false) {
-            $options["ssl"] = [
-                'verify_peer_name' => $this->getCertValidation(),
-                'verify_peer' => $this->getCertValidation(),
-            ];
+        if (IMAP::ST_UID === $uid) {
+            return 'UID';
+        }
+        $uid = (string) $uid;
+        if ('' !== $uid && !is_numeric($uid)) {
+            return $uid;
         }
 
-        if ($this->proxy["socket"] != null) {
-            $options[$transport]["proxy"] = $this->proxy["socket"];
-            $options[$transport]["request_fulluri"] = $this->proxy["request_fulluri"];
+        return '';
+    }
 
-            if ($this->proxy["username"] != null) {
-                $auth = base64_encode($this->proxy["username"].':'.$this->proxy["password"]);
-
-                $options[$transport]["header"] = [
-                    "Proxy-Authorization: Basic $auth",
-                ];
-            }
-        }
-
-        return $options;
+    public function buildUIDCommand(string $command, int|string $uid): string
+    {
+        return trim($this->getUIDKey($uid).' '.$command);
     }
 
     /**
-     * Create a new resource stream
-     * @param $transport
-     * @param string $host hostname or IP address of IMAP server
-     * @param int $port of IMAP server, default is 143 (993 for ssl)
-     * @param int $timeout timeout in seconds for initiating session
+     * Set the uid cache of the current active folder.
      *
-     * @return resource|boolean The socket created.
+     * @param null|list<ImapUid> $uids
+     */
+    public function setUidCache(?array $uids): void
+    {
+        if (null === $uids) {
+            $this->uidCache = null;
+
+            return;
+        }
+
+        $messageNumber = 1;
+        $uidCache = [];
+        foreach ($uids as $uid) {
+            $uidCache[$messageNumber++] = $uid;
+        }
+
+        $this->uidCache = $uidCache;
+    }
+
+    public function enableUidCache(): void
+    {
+        $this->enableUidCache = true;
+    }
+
+    public function disableUidCache(): void
+    {
+        $this->enableUidCache = false;
+    }
+
+    /**
+     * @phpstan-param int|iterable<int> $from
+     * @phpstan-param int|float|null    $to
+     *
+     * Build a valid UID sequence.
+     *
+     * @throws RuntimeException
+     */
+    public function buildSequence(int|iterable $from, float|int|null $to = null): string
+    {
+        if (\is_iterable($from)) {
+            if (null !== $to) {
+                throw new RuntimeException('setting to is not allowed if from is given an arrays');
+            }
+
+            return implode(',', [...$from]);
+        }
+
+        if (null === $to) {
+            return (string) $from;
+        }
+
+        if (INF === $to) {
+            return $from.':*';
+        }
+
+        return $from.':'.(int) $to;
+    }
+
+    /**
+     * Create a new resource stream.
+     *
+     * @return resource the socket created
+     *
      * @throws ConnectionFailedException
      */
-    protected function createStream($transport, $host, $port, $timeout)
+    protected function createStream(string $transport, string $host, int $port, int $timeout): mixed
     {
-        $socket = "$transport://$host:$port";
+        $socket = "{$transport}://{$host}:{$port}";
         $stream = stream_socket_client(
             $socket,
             $errno,
@@ -221,7 +229,7 @@ abstract class AbstractProtocol implements ProtocolInterface
             stream_context_create($this->defaultSocketOptions($transport))
         );
 
-        if (!$stream) {
+        if (false === $stream) {
             throw new ConnectionFailedException($errstr, $errno);
         }
 
@@ -233,79 +241,32 @@ abstract class AbstractProtocol implements ProtocolInterface
     }
 
     /**
-     * @return int
-     */
-    public function getConnectionTimeout()
-    {
-        return $this->connection_timeout;
-    }
-
-    /**
-     * @param int $connection_timeout
-     * @return AbstractProtocol
-     */
-    public function setConnectionTimeout($connection_timeout)
-    {
-        if ($connection_timeout !== null) {
-            $this->connection_timeout = $connection_timeout;
-        }
-
-        return $this;
-    }
-
-    /**
-     * Get the UID key string
-     * @param int|string $uid
+     * Prepare socket options.
      *
-     * @return string
+     * @return array<string, mixed>
      */
-    public function getUIDKey($uid)
+    private function defaultSocketOptions(string $transport): array
     {
-        if ($uid == IMAP::ST_UID || $uid == IMAP::FT_UID) {
-            return "UID";
-        }
-        if (strlen($uid) > 0 && !is_numeric($uid)) {
-            return (string)$uid;
-        }
-
-        return "";
-    }
-
-    public function buildUIDCommand($command, $uid)
-    {
-        return trim($this->getUIDKey($uid)." ".$command);
-    }
-
-    /**
-     * Set the uid cache of current active folder
-     *
-     * @param array|null $uids
-     */
-    public function setUidCache($uids)
-    {
-        if (is_null($uids)) {
-            $this->uid_cache = null;
-
-            return;
+        $options = [];
+        if (null !== $this->encryption) {
+            $options['ssl'] = [
+                'verify_peer_name' => $this->certValidation,
+                'verify_peer' => $this->certValidation,
+            ];
         }
 
-        $messageNumber = 1;
+        if ($this->proxy['socket']) {
+            $options[$transport]['proxy'] = $this->proxy['socket'];
+            $options[$transport]['request_fulluri'] = $this->proxy['request_fulluri'];
 
-        $uid_cache = [];
-        foreach ($uids as $uid) {
-            $uid_cache[$messageNumber++] = $uid;
+            if ($this->proxy['username']) {
+                $auth = base64_encode($this->proxy['username'].':'.$this->proxy['password']);
+                $options[$transport]['header'] = [
+                    "Proxy-Authorization: Basic {$auth}",
+                ];
+            }
         }
 
-        $this->uid_cache = $uid_cache;
-    }
-
-    public function enableUidCache()
-    {
-        $this->enable_uid_cache = true;
-    }
-
-    public function disableUidCache()
-    {
-        $this->enable_uid_cache = false;
+        return $options;
     }
 }

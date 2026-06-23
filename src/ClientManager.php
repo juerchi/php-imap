@@ -1,4 +1,5 @@
 <?php
+
 /*
 * File:     ClientManager.php
 * Category: -
@@ -13,18 +14,17 @@
 namespace Webklex\PHPIMAP;
 
 use Psr\Log\LoggerInterface;
+use Webklex\PHPIMAP\Support\ArrayHelper;
 
 /**
- * Class ClientManager
- *
- * @package Webklex\IMAP
+ * Class ClientManager.
  *
  * @mixin Client
  */
 class ClientManager
 {
     /**
-     * All library config
+     * All library configs.
      */
     public static array $config = [];
 
@@ -50,10 +50,8 @@ class ClientManager
     }
 
     /**
-     * Safely create a new client instance which is not listed in accounts
-     * @param array $config
+     * Safely create a new client instance which is not listed in accounts.
      *
-     * @return Client
      * @throws Exceptions\MaskNotFoundException
      */
     public function make(array $config): Client
@@ -65,47 +63,39 @@ class ClientManager
     }
 
     /**
-     * Get a dotted config parameter
-     * @param string $key
-     * @param mixed $default
-     *
-     * @return mixed|null
+     * Get a dotted config parameter.
      */
-    public static function get(string $key, $default = null)
+    public static function get(string $key, mixed $default = null): mixed
     {
         $parts = explode('.', $key);
         $value = null;
         foreach ($parts as $part) {
-            if ($value === null) {
+            if (null === $value) {
                 if (isset(self::$config[$part])) {
                     $value = self::$config[$part];
                 } else {
                     break;
                 }
+            } elseif (isset($value[$part])) {
+                $value = $value[$part];
             } else {
-                if (isset($value[$part])) {
-                    $value = $value[$part];
-                } else {
-                    break;
-                }
+                break;
             }
         }
 
-        return $value === null ? $default : $value;
+        return $value ?? $default;
     }
 
     /**
-     * Resolve a account instance.
-     * @param string|null $name
+     * Resolve an account instance.
      *
-     * @return Client
      * @throws Exceptions\MaskNotFoundException
      */
     public function account(?string $name = null): Client
     {
         $name = $name ?: $this->getDefaultAccount();
 
-        // If the connection has not been resolved we will resolve it now as all
+        // If the connection has not been resolved, we will resolve it now as all
         // the connections are resolved when they are actually needed, so we do
         // not make any unnecessary connection to the various queue end-points.
         if (!isset($this->accounts[$name])) {
@@ -113,35 +103,6 @@ class ClientManager
         }
 
         return $this->accounts[$name];
-    }
-
-    /**
-     * Resolve an account.
-     * @param string $name
-     *
-     * @return Client
-     * @throws Exceptions\MaskNotFoundException
-     */
-    protected function resolve(string $name): Client
-    {
-        $config = $this->getClientConfig($name);
-
-        $client = new Client($config);
-        $client->setLogger($this->logger);
-
-        return $client;
-    }
-
-    /**
-     * Get the account configuration.
-     */
-    protected function getClientConfig(?string $name): array
-    {
-        if ($name === null || $name === 'null') {
-            return ['driver' => 'null'];
-        }
-
-        return is_array(self::$config["accounts"][$name]) ? self::$config["accounts"][$name] : [];
     }
 
     /**
@@ -160,39 +121,36 @@ class ClientManager
         self::$config['default'] = $name;
     }
 
-
     /**
-     * Merge the vendor settings with the local config
+     * Merge the vendor settings with the local config.
      *
      * The default account identifier will be used as default for any missing account parameters.
-     * If however the default account is missing a parameter the package default account parameter will be used.
+     * If, however, the default account is missing a parameter, the package default account parameter will be used.
      * This can be disabled by setting imap.default in your config file to 'false'
-     *
-     * @return $this
      */
-    public function setConfig(array|string $config): ClientManager
+    public function setConfig(array|string $config): self
     {
-        if (is_array($config) === false) {
+        if (false === is_array($config)) {
             $config = require $config;
         }
 
-        $config_key = 'imap';
-        $path = __DIR__.'/config/'.$config_key.'.php';
+        $configKey = 'imap';
+        $path = __DIR__.'/config/'.$configKey.'.php';
 
-        $vendor_config = require $path;
-        $config = $this->array_merge_recursive_distinct($vendor_config, $config);
+        $vendorConfig = require $path;
+        $config = ArrayHelper::mergeRecursiveDistinct($vendorConfig, $config);
 
         if (is_array($config)) {
             if (isset($config['default'])) {
                 if (isset($config['accounts']) && $config['default']) {
-                    $default_config = $vendor_config['accounts']['default'];
+                    $defaultConfig = $vendorConfig['accounts']['default'];
                     if (isset($config['accounts'][$config['default']])) {
-                        $default_config = array_merge($default_config, $config['accounts'][$config['default']]);
+                        $defaultConfig = array_merge($defaultConfig, $config['accounts'][$config['default']]);
                     }
 
                     if (is_array($config['accounts'])) {
-                        foreach ($config['accounts'] as $account_key => $account) {
-                            $config['accounts'][$account_key] = array_merge($default_config, $account);
+                        foreach ($config['accounts'] as $accountKey => $account) {
+                            $config['accounts'][$accountKey] = array_merge($defaultConfig, $account);
                         }
                     }
                 }
@@ -205,64 +163,29 @@ class ClientManager
     }
 
     /**
-     * Marge arrays recursively and distinct
+     * Resolve an account.
      *
-     * Merges any number of arrays / parameters recursively, replacing
-     * entries with string keys with values from latter arrays.
-     * If the entry or the next value to be assigned is an array, then it
-     * automatically treats both arguments as an array.
-     * Numeric entries are appended, not replaced, but only if they are
-     * unique
-     *
-     * @return array|mixed
-     *
-     * @link   http://www.php.net/manual/en/function.array-merge-recursive.php#96201
-     * @author Mark Roduner <mark.roduner@gmail.com>
+     * @throws Exceptions\MaskNotFoundException
      */
-    private function array_merge_recursive_distinct(): mixed
+    protected function resolve(string $name): Client
     {
-        $arrays = func_get_args();
-        $base = array_shift($arrays);
+        $config = $this->getClientConfig($name);
 
-        $isAssoc = static function (array $arr) {
-            return [] !== $arr && !array_is_list($arr);
-        };
+        $client = new Client($config);
+        $client->setLogger($this->logger);
 
-        if (!is_array($base)) {
-            $base = empty($base) ? array() : array($base);
+        return $client;
+    }
+
+    /**
+     * Get the account configuration.
+     */
+    protected function getClientConfig(?string $name): array
+    {
+        if (null === $name || 'null' === $name) {
+            return ['driver' => 'null'];
         }
 
-        foreach ($arrays as $append) {
-            if (!is_array($append)) {
-                $append = array($append);
-            }
-
-            foreach ($append as $key => $value) {
-                if (!array_key_exists($key, $base) && !is_numeric($key)) {
-                    $base[$key] = $value;
-                    continue;
-                }
-
-                if (
-                    (is_array($value) && $isAssoc($value))
-                    || (is_array($base[$key]) && $isAssoc($base[$key]))
-                ) {
-                    // If the arrays are not associates we don't want to array_merge_recursive_distinct
-                    // else merging $baseConfig['dispositions'] = ['attachment', 'inline'] with $customConfig['dispositions'] = ['attachment']
-                    // results in $resultConfig['dispositions'] = ['attachment', 'inline']
-                    $base[$key] = $this->array_merge_recursive_distinct($base[$key], $value);
-                } else {
-                    if (is_numeric($key)) {
-                        if (!in_array($value, $base, true)) {
-                            $base[] = $value;
-                        }
-                    } else {
-                        $base[$key] = $value;
-                    }
-                }
-            }
-        }
-
-        return $base;
+        return is_array(self::$config['accounts'][$name]) ? self::$config['accounts'][$name] : [];
     }
 }

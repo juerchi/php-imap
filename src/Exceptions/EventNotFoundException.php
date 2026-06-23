@@ -1,4 +1,5 @@
 <?php
+
 /*
 * File:     EventNotFoundException.php
 * Category: Exception
@@ -12,13 +13,7 @@
 
 namespace Webklex\PHPIMAP\Exceptions;
 
-use Exception;
-
 /**
- * Class EventNotFoundException
- *
- * @package Webklex\PHPIMAP\Exceptions
+ * Class EventNotFoundException.
  */
-class EventNotFoundException extends Exception
-{
-}
+class EventNotFoundException extends \Exception {}

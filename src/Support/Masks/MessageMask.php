@@ -1,4 +1,5 @@
 <?php
+
 /*
 * File: MessageMask.php
 * Category: Mask
@@ -15,24 +16,17 @@ namespace Webklex\PHPIMAP\Support\Masks;
 use Webklex\PHPIMAP\Attachment;
 use Webklex\PHPIMAP\Message;
 
-/**
- * Class MessageMask
- *
- * @package Webklex\PHPIMAP\Support\Masks
- */
 class MessageMask extends Mask
 {
-    /** @var Message $parent */
-    protected $parent;
+    /** @var Message */
+    protected object $parent;
 
     /**
-     * Get the message html body
-     *
-     * @return string|null
+     * Get the message HTML body.
      */
-    public function getHtmlBody()
+    public function getHtmlBody(): ?string
     {
-        $bodies = $this->parent->getBodies();
+        $bodies = $this->parent;
         if (!isset($bodies['html'])) {
             return null;
         }
@@ -40,52 +34,42 @@ class MessageMask extends Mask
         if (is_object($bodies['html']) && property_exists($bodies['html'], 'content')) {
             return $bodies['html']->content;
         }
+
         return $bodies['html'];
     }
 
     /**
-     * Get the Message html body filtered by an optional callback
-     * @param callable|bool $callback
-     *
-     * @return string|null
+     * Get the Message HTML body filtered by an optional callback.
      */
-    public function getCustomHTMLBody($callback = false)
+    public function getCustomHTMLBody(?callable $callback = null): ?string
     {
         $body = $this->getHtmlBody();
-        if ($body === null) {
+        if (null === $body) {
             return null;
         }
 
-        if ($callback !== false) {
-            $aAttachment = $this->parent->getAttachments();
-            $aAttachment->each(function ($oAttachment) use (&$body, $callback) {
-                /** @var Attachment $oAttachment */
-                if (is_callable($callback)) {
-                    $body = $callback($body, $oAttachment);
-                } elseif (is_string($callback)) {
-                    call_user_func($callback, [$body, $oAttachment]);
-                }
-            });
+        if (null !== $callback) {
+            foreach ($this->parent->getAttachments() as $oAttachment) {
+                $body = $callback($body, $oAttachment);
+            }
         }
 
         return $body;
     }
 
     /**
-     * Get the Message html body with embedded base64 images
-     * the resulting $body.
-     *
-     * @return string|null
+     * Get the Message HTML body with embedded base64 images the resulting $body.
      */
-    public function getHTMLBodyWithEmbeddedBase64Images()
+    public function getHTMLBodyWithEmbeddedBase64Images(): ?string
     {
-        return $this->getCustomHTMLBody(function ($body, $oAttachment) {
-            /** @var Attachment $oAttachment */
-            if ($oAttachment->id) {
-                $body = str_replace('cid:'.$oAttachment->id, 'data:'.$oAttachment->getContentType().';base64, '.base64_encode($oAttachment->getContent()), $body);
-            }
+        return $this->getCustomHTMLBody(
+            function ($body, Attachment $oAttachment) {
+                if ($oAttachment->id) {
+                    $body = str_replace('cid:'.$oAttachment->id, 'data:'.$oAttachment->getContentType().';base64, '.base64_encode($oAttachment->getContent()), $body);
+                }
 
-            return $body;
-        });
+                return $body;
+            }
+        );
     }
 }

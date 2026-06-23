@@ -1,4 +1,5 @@
 <?php
+
 /*
 * File:     GetMessagesFailedException.php
 * Category: Exception
@@ -12,13 +13,7 @@
 
 namespace Webklex\PHPIMAP\Exceptions;
 
-use Exception;
-
 /**
- * Class GetMessagesFailedException
- *
- * @package Webklex\PHPIMAP\Exceptions
+ * Class GetMessagesFailedException.
  */
-class GetMessagesFailedException extends Exception
-{
-}
+class GetMessagesFailedException extends \Exception {}

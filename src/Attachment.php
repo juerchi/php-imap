@@ -1,4 +1,5 @@
 <?php
+
 /*
 * File:     Attachment.php
 * Category: -
@@ -12,207 +13,232 @@
 
 namespace Webklex\PHPIMAP;
 
-use Illuminate\Support\Str;
 use Symfony\Component\Mime\MimeTypes;
+use Symfony\Component\String\UnicodeString;
 use Webklex\PHPIMAP\Exceptions\MaskNotFoundException;
 use Webklex\PHPIMAP\Exceptions\MethodNotFoundException;
-use Webklex\PHPIMAP\Support\Masks\AttachmentMask;
 
 /**
- * Class Attachment
+ * Class Attachment.
  *
- * @package Webklex\PHPIMAP
- *
- * @property integer $part_number
- * @property integer $size
+ * @property int    $partNumber
+ * @property int    $size
  * @property string $content
  * @property string $type
- * @property string $content_type
+ * @property string $contentType
  * @property string $id
  * @property string $name
  * @property string $disposition
- * @property string $img_src
+ * @property string $imgSrc
  *
- * @method integer getPartNumber()
- * @method integer setPartNumber(integer $part_number)
- * @method string  getContent()
- * @method string  setContent(string $content)
- * @method string  getType()
- * @method string  setType(string $type)
- * @method string  getContentType()
- * @method string  setContentType(string $content_type)
- * @method string  getId()
- * @method string  setId(string $id)
- * @method string  getSize()
- * @method string  setSize(integer $size)
- * @method string  getName()
- * @method string  getDisposition()
- * @method string  setDisposition(string $disposition)
- * @method string  setImgSrc(string $img_src)
+ * @method int         getPartNumber()
+ * @method int         setPartNumber(integer $partNumber)
+ * @method string      getContent()
+ * @method string      setContent(string $content)
+ * @method string      getType()
+ * @method string      setType(string $type)
+ * @method string      getContentType()
+ * @method string      setContentType(string $contentType)
+ * @method null|string getId()
+ * @method string      setId(string $id)
+ * @method string      getSize()
+ * @method string      setSize(integer $size)
+ * @method null|string getName()
+ * @method string      getDisposition()
+ * @method string      setDisposition(string $disposition)
+ * @method string      getImgSrc()
+ * @method string      setImgSrc(string $imgSrc)
  */
-class Attachment
+final class Attachment
 {
-    /**
-     * @var Message $oMessage
-     */
-    protected $oMessage;
+    private Message $oMessage;
 
     /**
-     * Used config
+     * Used config.
      */
-    protected array $config = [];
+    private array $config;
 
-    /** @var Part $part */
-    protected $part;
+    private Part $part;
 
     /**
-     * Attribute holder
+     * Attribute holder.
      */
-    protected array $attributes = [
+    public private(set) array $attributes = [
         'content' => null,
         'type' => null,
-        'part_number' => 0,
-        'content_type' => null,
+        'partNumber' => 0,
+        'contentType' => null,
         'id' => null,
         'name' => null,
         'disposition' => null,
-        'img_src' => null,
+        'imgSrc' => null,
         'size' => null,
     ];
 
     /**
-     * Default mask
+     * Default mask.
      */
-    protected string $mask = AttachmentMask::class;
+    private string $mask;
 
-    /**
-     * Attachment constructor.
-     * @param Message $oMessage
-     * @param Part $part
-     */
     public function __construct(Message $oMessage, Part $part)
     {
         $this->config = ClientManager::get('options');
 
         $this->oMessage = $oMessage;
         $this->part = $part;
-        $this->part_number = $part->part_number;
-
-        $default_mask = $this->oMessage->getClient()->getDefaultAttachmentMask();
-        if ($default_mask != null) {
-            $this->mask = $default_mask;
-        }
+        $this->partNumber = $part->partNumber;
+        $this->mask = $this->oMessage->getClient()->getDefaultAttachmentMask();
 
         $this->findType();
         $this->fetch();
     }
 
     /**
-     * Call dynamic attribute setter and getter methods
-     * @param string $method
-     * @param array $arguments
+     * Call dynamic attribute setter and getter methods.
      *
-     * @return mixed
      * @throws MethodNotFoundException
      */
-    public function __call(string $method, array $arguments)
+    public function __call(string $method, array $arguments): mixed
     {
-        if (strtolower(substr($method, 0, 3)) === 'get') {
-            $name = Str::snake(substr($method, 3));
+        if (0 === stripos($method, 'get')) {
+            $name = new UnicodeString(substr($method, 3))->camel()->toString();
 
-            if (isset($this->attributes[$name])) {
-                return $this->attributes[$name];
-            }
+            return $this->attributes[$name] ?? null;
+        }
 
-            return null;
-        } elseif (strtolower(substr($method, 0, 3)) === 'set') {
-            $name = Str::snake(substr($method, 3));
-
+        if (0 === stripos($method, 'set')) {
+            $name = new UnicodeString(substr($method, 3))->camel()->toString();
             $this->attributes[$name] = array_pop($arguments);
 
             return $this->attributes[$name];
         }
 
-        throw new MethodNotFoundException("Method ".self::class.'::'.$method.'() is not supported');
+        throw new MethodNotFoundException('Method '.self::class.'::'.$method.'() is not supported');
     }
 
-    /**
-     * Magic setter
-     * @param $name
-     * @param $value
-     *
-     * @return void
-     */
-    public function __set($name, $value): void
+    public function __set(mixed $name, mixed $value): void
     {
         $this->attributes[$name] = $value;
     }
 
+    public function __isset(mixed $name): bool
+    {
+        return isset($this->attributes[$name]);
+    }
+
+    public function __get(mixed $name): mixed
+    {
+        return $this->attributes[$name] ?? null;
+    }
+
     /**
-     * magic getter
-     * @param $name
+     * Set the attachment name and try to decode it.
+     */
+    public function setName(?string $name): void
+    {
+        $decoder = $this->config['decoder']['attachment'];
+        if (null !== $name) {
+            if ('utf-8' === $decoder && extension_loaded('imap')) {
+                $this->name = \imap_utf8($name);
+            } else {
+                $this->name = mb_decode_mimeheader($name);
+            }
+        }
+    }
+
+    /**
+     * Get the attachment mime type.
+     */
+    public function getMimeType(): ?string
+    {
+        return new \finfo()->buffer($this->getContent(), FILEINFO_MIME_TYPE) ?: null;
+    }
+
+    /**
+     * Try to guess the attachment file extension.
+     */
+    public function getExtension(): ?string
+    {
+        $mimeType = $this->getMimeType();
+
+        return null === $mimeType ? null : array_first(MimeTypes::getDefault()->getExtensions($mimeType));
+    }
+
+    public function getMessage(): Message
+    {
+        return $this->oMessage;
+    }
+
+    /**
+     * Set the default mask.
      *
-     * @return mixed|null
+     * @return $this
      */
-    public function __get($name)
+    public function setMask(string $mask): self
     {
-        if (isset($this->attributes[$name])) {
-            return $this->attributes[$name];
+        if (class_exists($mask)) {
+            $this->mask = $mask;
         }
 
-        return null;
+        return $this;
     }
 
     /**
-     * Determine the structure type
+     * Get the used default mask.
      */
-    protected function findType()
+    public function getMask(): string
     {
-        switch ($this->part->type) {
-            case IMAP::ATTACHMENT_TYPE_MESSAGE:
-                $this->type = 'message';
-                break;
-            case IMAP::ATTACHMENT_TYPE_APPLICATION:
-                $this->type = 'application';
-                break;
-            case IMAP::ATTACHMENT_TYPE_AUDIO:
-                $this->type = 'audio';
-                break;
-            case IMAP::ATTACHMENT_TYPE_IMAGE:
-                $this->type = 'image';
-                break;
-            case IMAP::ATTACHMENT_TYPE_VIDEO:
-                $this->type = 'video';
-                break;
-            case IMAP::ATTACHMENT_TYPE_MODEL:
-                $this->type = 'model';
-                break;
-            case IMAP::ATTACHMENT_TYPE_TEXT:
-                $this->type = 'text';
-                break;
-            case IMAP::ATTACHMENT_TYPE_MULTIPART:
-                $this->type = 'multipart';
-                break;
-            default:
-                $this->type = 'other';
-                break;
-        }
+        return $this->mask;
     }
 
     /**
-     * Fetch the given attachment
+     * Get a masked instance by providing a mask name.
+     *
+     * @throws MaskNotFoundException
      */
-    protected function fetch()
+    public function mask(?string $mask = null): mixed
+    {
+        $mask ??= $this->mask;
+
+        if (class_exists($mask)) {
+            return new $mask($this);
+        }
+
+        throw new MaskNotFoundException('Unknown mask provided: '.$mask);
+    }
+
+    /**
+     * Determine the structure type.
+     */
+    private function findType(): void
+    {
+        $this->type = match ($this->part->type) {
+            IMAP::ATTACHMENT_TYPE_MESSAGE => 'message',
+            IMAP::ATTACHMENT_TYPE_APPLICATION => 'application',
+            IMAP::ATTACHMENT_TYPE_AUDIO => 'audio',
+            IMAP::ATTACHMENT_TYPE_IMAGE => 'image',
+            IMAP::ATTACHMENT_TYPE_VIDEO => 'video',
+            IMAP::ATTACHMENT_TYPE_MODEL => 'model',
+            IMAP::ATTACHMENT_TYPE_TEXT => 'text',
+            IMAP::ATTACHMENT_TYPE_MULTIPART => 'multipart',
+            default => 'other',
+        };
+    }
+
+    /**
+     * Fetch the given attachment.
+     */
+    private function fetch(): void
     {
         $content = $this->part->content;
 
-        $this->content_type = $this->part->content_type;
+        $this->contentType = $this->part->contentType;
         $this->content = $this->oMessage->decodeString($content, $this->part->encoding);
 
         if (($id = $this->part->id) !== null) {
             $this->id = str_replace(['<', '>'], '', $id);
         } else {
-            $this->id = hash("sha256", (string)microtime(true));
+            $this->id = hash('sha256', (string) microtime(true));
         }
 
         $this->size = $this->part->bytes;
@@ -223,111 +249,15 @@ class Attachment
         } elseif (($name = $this->part->name) !== null) {
             $this->setName($name);
         } else {
-            $this->setName("undefined");
+            $this->setName('undefined');
         }
 
-        if (IMAP::ATTACHMENT_TYPE_MESSAGE == $this->part->type) {
+        if (IMAP::ATTACHMENT_TYPE_MESSAGE === $this->part->type) {
             if ($this->part->ifdescription) {
                 $this->setName($this->part->description);
             } else {
                 $this->setName($this->part->subtype);
             }
         }
-    }
-
-    /**
-     * Set the attachment name and try to decode it
-     */
-    public function setName(?string $name): void
-    {
-        $decoder = $this->config['decoder']['attachment'];
-        if ($name !== null) {
-            if ($decoder === 'utf-8' && extension_loaded('imap')) {
-                $this->name = \imap_utf8($name);
-            } else {
-                $this->name = mb_decode_mimeheader($name);
-            }
-        }
-    }
-
-    /**
-     * Get the attachment mime type
-     *
-     * @return string|null
-     */
-    public function getMimeType()
-    {
-        return (new \finfo())->buffer($this->getContent(), FILEINFO_MIME_TYPE);
-    }
-
-    /**
-     * Try to guess the attachment file extension
-     */
-    public function getExtension(): ?string
-    {
-        $extensions = MimeTypes::getDefault()
-            ->getExtensions($this->getMimeType());
-
-        return $extensions[0] ?? null;
-    }
-
-    /**
-     * Get all attributes
-     *
-     * @return array
-     */
-    public function getAttributes(): array
-    {
-        return $this->attributes;
-    }
-
-    /**
-     * @return Message
-     */
-    public function getMessage(): Message
-    {
-        return $this->oMessage;
-    }
-
-    /**
-     * Set the default mask
-     * @param $mask
-     *
-     * @return $this
-     */
-    public function setMask($mask): Attachment
-    {
-        if (class_exists($mask)) {
-            $this->mask = $mask;
-        }
-
-        return $this;
-    }
-
-    /**
-     * Get the used default mask
-     *
-     * @return string
-     */
-    public function getMask(): string
-    {
-        return $this->mask;
-    }
-
-    /**
-     * Get a masked instance by providing a mask name
-     * @param string|null $mask
-     *
-     * @return mixed
-     * @throws MaskNotFoundException
-     */
-    public function mask($mask = null)
-    {
-        $mask = $mask !== null ? $mask : $this->mask;
-        if (class_exists($mask)) {
-            return new $mask($this);
-        }
-
-        throw new MaskNotFoundException("Unknown mask provided: ".$mask);
     }
 }

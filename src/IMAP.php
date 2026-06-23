@@ -1,4 +1,5 @@
 <?php
+
 /*
 * File: IMAP.php
 * Category: -
@@ -13,362 +14,293 @@
 namespace Webklex\PHPIMAP;
 
 /**
- * Class IMAP
+ * Class IMAP.
  *
  * Independent imap const holder
  */
 class IMAP
 {
     /**
-     * Message const
-     *
-     * @const integer   TYPE_TEXT
-     * @const integer   TYPE_MULTIPART
-     *
-     * @const integer   ENC_7BIT
-     * @const integer   ENC_8BIT
-     * @const integer   ENC_BINARY
-     * @const integer   ENC_BASE64
-     * @const integer   ENC_QUOTED_PRINTABLE
-     * @const integer   ENC_OTHER
+     * Message const.
      */
-    public const MESSAGE_TYPE_TEXT = 0;
-    public const MESSAGE_TYPE_MULTIPART = 1;
+    public const int MESSAGE_TYPE_TEXT = 0;
+    public const int MESSAGE_TYPE_MULTIPART = 1;
 
-    public const MESSAGE_ENC_7BIT = 0;
-    public const MESSAGE_ENC_8BIT = 1;
-    public const MESSAGE_ENC_BINARY = 2;
-    public const MESSAGE_ENC_BASE64 = 3;
-    public const MESSAGE_ENC_QUOTED_PRINTABLE = 4;
-    public const MESSAGE_ENC_OTHER = 5;
+    public const int MESSAGE_ENC_7BIT = 0;
+    public const int MESSAGE_ENC_8BIT = 1;
+    public const int MESSAGE_ENC_BINARY = 2;
+    public const int MESSAGE_ENC_BASE64 = 3;
+    public const int MESSAGE_ENC_QUOTED_PRINTABLE = 4;
+    public const int MESSAGE_ENC_OTHER = 5;
 
-    public const MESSAGE_PRIORITY_UNKNOWN = 0;
-    public const MESSAGE_PRIORITY_HIGHEST = 1;
-    public const MESSAGE_PRIORITY_HIGH = 2;
-    public const MESSAGE_PRIORITY_NORMAL = 3;
-    public const MESSAGE_PRIORITY_LOW = 4;
-    public const MESSAGE_PRIORITY_LOWEST = 5;
+    public const int MESSAGE_PRIORITY_UNKNOWN = 0;
+    public const int MESSAGE_PRIORITY_HIGHEST = 1;
+    public const int MESSAGE_PRIORITY_HIGH = 2;
+    public const int MESSAGE_PRIORITY_NORMAL = 3;
+    public const int MESSAGE_PRIORITY_LOW = 4;
+    public const int MESSAGE_PRIORITY_LOWEST = 5;
 
     /**
-     * Attachment const
-     *
-     * @const integer   TYPE_TEXT
-     * @const integer   TYPE_MULTIPART
-     * @const integer   TYPE_MESSAGE
-     * @const integer   TYPE_APPLICATION
-     * @const integer   TYPE_AUDIO
-     * @const integer   TYPE_IMAGE
-     * @const integer   TYPE_VIDEO
-     * @const integer   TYPE_MODEL
-     * @const integer   TYPE_OTHER
+     * Attachment const.
      */
-    public const ATTACHMENT_TYPE_TEXT = 0;
-    public const ATTACHMENT_TYPE_MULTIPART = 1;
-    public const ATTACHMENT_TYPE_MESSAGE = 2;
-    public const ATTACHMENT_TYPE_APPLICATION = 3;
-    public const ATTACHMENT_TYPE_AUDIO = 4;
-    public const ATTACHMENT_TYPE_IMAGE = 5;
-    public const ATTACHMENT_TYPE_VIDEO = 6;
-    public const ATTACHMENT_TYPE_MODEL = 7;
-    public const ATTACHMENT_TYPE_OTHER = 8;
+    public const int ATTACHMENT_TYPE_TEXT = 0;
+    public const int ATTACHMENT_TYPE_MULTIPART = 1;
+    public const int ATTACHMENT_TYPE_MESSAGE = 2;
+    public const int ATTACHMENT_TYPE_APPLICATION = 3;
+    public const int ATTACHMENT_TYPE_AUDIO = 4;
+    public const int ATTACHMENT_TYPE_IMAGE = 5;
+    public const int ATTACHMENT_TYPE_VIDEO = 6;
+    public const int ATTACHMENT_TYPE_MODEL = 7;
+    public const int ATTACHMENT_TYPE_OTHER = 8;
 
     /**
-     * Client const
-     *
-     * @const integer   CLIENT_OPENTIMEOUT
-     * @const integer   CLIENT_READTIMEOUT
-     * @const integer   CLIENT_WRITETIMEOUT
-     * @const integer   CLIENT_CLOSETIMEOUT
+     * Client const.
      */
-    public const CLIENT_OPENTIMEOUT = 1;
-    public const CLIENT_READTIMEOUT = 2;
-    public const CLIENT_WRITETIMEOUT = 3;
-    public const CLIENT_CLOSETIMEOUT = 4;
+    public const int CLIENT_OPENTIMEOUT = 1;
+    public const int CLIENT_READTIMEOUT = 2;
+    public const int CLIENT_WRITETIMEOUT = 3;
+    public const int CLIENT_CLOSETIMEOUT = 4;
 
     /**
-     * Generic imap const
-     *
-     * @const integer NIL
-     * @const integer IMAP_OPENTIMEOUT
-     * @const integer IMAP_READTIMEOUT
-     * @const integer IMAP_WRITETIMEOUT
-     * @const integer IMAP_CLOSETIMEOUT
-     * @const integer OP_DEBUG
-     * @const integer OP_READONLY
-     * @const integer OP_ANONYMOUS
-     * @const integer OP_SHORTCACHE
-     * @const integer OP_SILENT
-     * @const integer OP_PROTOTYPE
-     * @const integer OP_HALFOPEN
-     * @const integer OP_EXPUNGE
-     * @const integer OP_SECURE
-     * @const integer CL_EXPUNGE
-     * @const integer FT_UID
-     * @const integer FT_PEEK
-     * @const integer FT_NOT
-     * @const integer FT_INTERNAL
-     * @const integer FT_PREFETCHTEXT
-     * @const integer ST_UID
-     * @const integer ST_SILENT
-     * @const integer ST_SET
-     * @const integer CP_UID
-     * @const integer CP_MOVE
-     * @const integer SE_UID
-     * @const integer SE_FREE
-     * @const integer SE_NOPREFETCH
-     * @const integer SO_FREE
-     * @const integer SO_NOSERVER
-     * @const integer SA_MESSAGES
-     * @const integer SA_RECENT
-     * @const integer SA_UNSEEN
-     * @const integer SA_UIDNEXT
-     * @const integer SA_UIDVALIDITY
-     * @const integer SA_ALL
-     * @const integer LATT_NOINFERIORS
-     * @const integer LATT_NOSELECT
-     * @const integer LATT_MARKED
-     * @const integer LATT_UNMARKED
-     * @const integer LATT_REFERRAL
-     * @const integer LATT_HASCHILDREN
-     * @const integer LATT_HASNOCHILDREN
-     * @const integer SORTDATE
-     * @const integer SORTARRIVAL
-     * @const integer SORTFROM
-     * @const integer SORTSUBJECT
-     * @const integer SORTTO
-     * @const integer SORTCC
-     * @const integer SORTSIZE
-     * @const integer TYPETEXT
-     * @const integer TYPEMULTIPART
-     * @const integer TYPEMESSAGE
-     * @const integer TYPEAPPLICATION
-     * @const integer TYPEAUDIO
-     * @const integer TYPEIMAGE
-     * @const integer TYPEVIDEO
-     * @const integer TYPEMODEL
-     * @const integer TYPEOTHER
-     * @const integer ENC7BIT
-     * @const integer ENC8BIT
-     * @const integer ENCBINARY
-     * @const integer ENCBASE64
-     * @const integer ENCQUOTEDPRINTABLE
-     * @const integer ENCOTHER
-     * @const integer IMAP_GC_ELT
-     * @const integer IMAP_GC_ENV
-     * @const integer IMAP_GC_TEXTS
+     * Generic imap const.
      */
-
-    public const NIL = 0;
-    public const IMAP_OPENTIMEOUT = 1;
-    public const IMAP_READTIMEOUT = 2;
-    public const IMAP_WRITETIMEOUT = 3;
-    public const IMAP_CLOSETIMEOUT = 4;
-    public const OP_DEBUG = 1;
+    public const int NIL = 0;
+    public const int IMAP_OPENTIMEOUT = 1;
+    public const int IMAP_READTIMEOUT = 2;
+    public const int IMAP_WRITETIMEOUT = 3;
+    public const int IMAP_CLOSETIMEOUT = 4;
+    public const int OP_DEBUG = 1;
 
     /**
-     * Open mailbox read-only
-     * @link http://php.net/manual/en/imap.constants.php
+     * Open mailbox read-only.
+     *
+     * @see http://php.net/manual/en/imap.constants.php
      */
-    public const OP_READONLY = 2;
+    public const int OP_READONLY = 2;
 
     /**
      * Don't use or update a .newsrc for news
-     * (NNTP only)
-     * @link http://php.net/manual/en/imap.constants.php
+     * (NNTP only).
+     *
+     * @see http://php.net/manual/en/imap.constants.php
      */
-    public const OP_ANONYMOUS = 4;
-    public const OP_SHORTCACHE = 8;
-    public const OP_SILENT = 16;
-    public const OP_PROTOTYPE = 32;
+    public const int OP_ANONYMOUS = 4;
+    public const int OP_SHORTCACHE = 8;
+    public const int OP_SILENT = 16;
+    public const int OP_PROTOTYPE = 32;
 
     /**
      * For IMAP and NNTP
      * names, open a connection but don't open a mailbox.
-     * @link http://php.net/manual/en/imap.constants.php
+     *
+     * @see http://php.net/manual/en/imap.constants.php
      */
-    public const OP_HALFOPEN = 64;
-    public const OP_EXPUNGE = 128;
-    public const OP_SECURE = 256;
+    public const int OP_HALFOPEN = 64;
+    public const int OP_EXPUNGE = 128;
+    public const int OP_SECURE = 256;
 
     /**
      * silently expunge the mailbox before closing when
-     * calling <b>imap_close</b>
-     * @link http://php.net/manual/en/imap.constants.php
+     * calling <b>imap_close</b>.
+     *
+     * @see http://php.net/manual/en/imap.constants.php
      */
-    public const CL_EXPUNGE = 32768;
+    public const int CL_EXPUNGE = 32768;
 
     /**
-     * The parameter is a UID
-     * @link http://php.net/manual/en/imap.constants.php
+     * The parameter is a UID.
+     *
+     * @see http://php.net/manual/en/imap.constants.php
      */
-    public const FT_UID = 1;
+    public const int FT_UID = 1;
 
     /**
-     * Do not set the \Seen flag if not already set
-     * @link http://php.net/manual/en/imap.constants.php
+     * Do not set the \Seen flag if not already set.
+     *
+     * @see http://php.net/manual/en/imap.constants.php
      */
-    public const FT_PEEK = 2;
-    public const FT_NOT = 4;
+    public const int FT_PEEK = 2;
+    public const int FT_NOT = 4;
 
     /**
      * The return string is in internal format, will not canonicalize to CRLF.
-     * @link http://php.net/manual/en/imap.constants.php
+     *
+     * @see http://php.net/manual/en/imap.constants.php
      */
-    public const FT_INTERNAL = 8;
-    public const FT_PREFETCHTEXT = 32;
+    public const int FT_INTERNAL = 8;
+    public const int FT_PREFETCHTEXT = 32;
 
     /**
-     * The sequence argument contains UIDs instead of sequence numbers
-     * @link http://php.net/manual/en/imap.constants.php
+     * The sequence argument contains UIDs instead of sequence numbers.
+     *
+     * @see http://php.net/manual/en/imap.constants.php
      */
-    public const ST_UID = 1;
-    public const ST_SILENT = 2;
-    public const ST_MSGN = 3;
-    public const ST_SET = 4;
+    public const int ST_UID = 1;
+    public const int ST_SILENT = 2;
+    public const int ST_MSGN = 3;
+    public const int ST_SET = 4;
 
     /**
-     * the sequence numbers contain UIDS
-     * @link http://php.net/manual/en/imap.constants.php
+     * the sequence numbers contain UIDS.
+     *
+     * @see http://php.net/manual/en/imap.constants.php
      */
-    public const CP_UID = 1;
+    public const int CP_UID = 1;
 
     /**
      * Delete the messages from the current mailbox after copying
-     * with <b>imap_mail_copy</b>
-     * @link http://php.net/manual/en/imap.constants.php
+     * with <b>imap_mail_copy</b>.
+     *
+     * @see http://php.net/manual/en/imap.constants.php
      */
-    public const CP_MOVE = 2;
+    public const int CP_MOVE = 2;
 
     /**
-     * Return UIDs instead of sequence numbers
-     * @link http://php.net/manual/en/imap.constants.php
+     * Return UIDs instead of sequence numbers.
+     *
+     * @see http://php.net/manual/en/imap.constants.php
      */
-    public const SE_UID = 1;
-    public const SE_FREE = 2;
+    public const int SE_UID = 1;
+    public const int SE_FREE = 2;
 
     /**
-     * Don't prefetch searched messages
-     * @link http://php.net/manual/en/imap.constants.php
+     * Don't prefetch searched messages.
+     *
+     * @see http://php.net/manual/en/imap.constants.php
      */
-    public const SE_NOPREFETCH = 4;
-    public const SO_FREE = 8;
-    public const SO_NOSERVER = 16;
-    public const SA_MESSAGES = 1;
-    public const SA_RECENT = 2;
-    public const SA_UNSEEN = 4;
-    public const SA_UIDNEXT = 8;
-    public const SA_UIDVALIDITY = 16;
-    public const SA_ALL = 31;
+    public const int SE_NOPREFETCH = 4;
+    public const int SO_FREE = 8;
+    public const int SO_NOSERVER = 16;
+    public const int SA_MESSAGES = 1;
+    public const int SA_RECENT = 2;
+    public const int SA_UNSEEN = 4;
+    public const int SA_UIDNEXT = 8;
+    public const int SA_UIDVALIDITY = 16;
+    public const int SA_ALL = 31;
 
     /**
      * This mailbox has no "children" (there are no
      * mailboxes below this one).
-     * @link http://php.net/manual/en/imap.constants.php
+     *
+     * @see http://php.net/manual/en/imap.constants.php
      */
-    public const LATT_NOINFERIORS = 1;
+    public const int LATT_NOINFERIORS = 1;
 
     /**
      * This is only a container, not a mailbox - you
      * cannot open it.
-     * @link http://php.net/manual/en/imap.constants.php
+     *
+     * @see http://php.net/manual/en/imap.constants.php
      */
-    public const LATT_NOSELECT = 2;
+    public const int LATT_NOSELECT = 2;
 
     /**
      * This mailbox is marked. Only used by UW-IMAPD.
-     * @link http://php.net/manual/en/imap.constants.php
+     *
+     * @see http://php.net/manual/en/imap.constants.php
      */
-    public const LATT_MARKED = 4;
+    public const int LATT_MARKED = 4;
 
     /**
      * This mailbox is not marked. Only used by
      * UW-IMAPD.
-     * @link http://php.net/manual/en/imap.constants.php
+     *
+     * @see http://php.net/manual/en/imap.constants.php
      */
-    public const LATT_UNMARKED = 8;
-    public const LATT_REFERRAL = 16;
-    public const LATT_HASCHILDREN = 32;
-    public const LATT_HASNOCHILDREN = 64;
+    public const int LATT_UNMARKED = 8;
+    public const int LATT_REFERRAL = 16;
+    public const int LATT_HASCHILDREN = 32;
+    public const int LATT_HASNOCHILDREN = 64;
 
     /**
      * Sort criteria for <b>imap_sort</b>:
      * message Date
-     * @link http://php.net/manual/en/imap.constants.php
+     *
+     * @see http://php.net/manual/en/imap.constants.php
      */
-    public const SORTDATE = 0;
+    public const int SORTDATE = 0;
 
     /**
      * Sort criteria for <b>imap_sort</b>:
      * arrival date
-     * @link http://php.net/manual/en/imap.constants.php
+     *
+     * @see http://php.net/manual/en/imap.constants.php
      */
-    public const SORTARRIVAL = 1;
+    public const int SORTARRIVAL = 1;
 
     /**
      * Sort criteria for <b>imap_sort</b>:
      * mailbox in first From address
-     * @link http://php.net/manual/en/imap.constants.php
+     *
+     * @see http://php.net/manual/en/imap.constants.php
      */
-    public const SORTFROM = 2;
+    public const int SORTFROM = 2;
 
     /**
      * Sort criteria for <b>imap_sort</b>:
      * message subject
-     * @link http://php.net/manual/en/imap.constants.php
+     *
+     * @see http://php.net/manual/en/imap.constants.php
      */
-    public const SORTSUBJECT = 3;
+    public const int SORTSUBJECT = 3;
 
     /**
      * Sort criteria for <b>imap_sort</b>:
      * mailbox in first To address
-     * @link http://php.net/manual/en/imap.constants.php
+     *
+     * @see http://php.net/manual/en/imap.constants.php
      */
-    public const SORTTO = 4;
+    public const int SORTTO = 4;
 
     /**
      * Sort criteria for <b>imap_sort</b>:
-     * mailbox in first cc address
-     * @link http://php.net/manual/en/imap.constants.php
+     * mailbox in the first cc address
+     *
+     * @see http://php.net/manual/en/imap.constants.php
      */
-    public const SORTCC = 5;
+    public const int SORTCC = 5;
 
     /**
      * Sort criteria for <b>imap_sort</b>:
-     * size of message in octets
-     * @link http://php.net/manual/en/imap.constants.php
+     * size of a message in octets
+     *
+     * @see http://php.net/manual/en/imap.constants.php
      */
-    public const SORTSIZE = 6;
-    public const TYPETEXT = 0;
-    public const TYPEMULTIPART = 1;
-    public const TYPEMESSAGE = 2;
-    public const TYPEAPPLICATION = 3;
-    public const TYPEAUDIO = 4;
-    public const TYPEIMAGE = 5;
-    public const TYPEVIDEO = 6;
-    public const TYPEMODEL = 7;
-    public const TYPEOTHER = 8;
-    public const ENC7BIT = 0;
-    public const ENC8BIT = 1;
-    public const ENCBINARY = 2;
-    public const ENCBASE64 = 3;
-    public const ENCQUOTEDPRINTABLE = 4;
-    public const ENCOTHER = 5;
+    public const int SORTSIZE = 6;
+    public const int TYPETEXT = 0;
+    public const int TYPEMULTIPART = 1;
+    public const int TYPEMESSAGE = 2;
+    public const int TYPEAPPLICATION = 3;
+    public const int TYPEAUDIO = 4;
+    public const int TYPEIMAGE = 5;
+    public const int TYPEVIDEO = 6;
+    public const int TYPEMODEL = 7;
+    public const int TYPEOTHER = 8;
+    public const int ENC7BIT = 0;
+    public const int ENC8BIT = 1;
+    public const int ENCBINARY = 2;
+    public const int ENCBASE64 = 3;
+    public const int ENCQUOTEDPRINTABLE = 4;
+    public const int ENCOTHER = 5;
 
     /**
      * Garbage collector, clear message cache elements.
-     * @link http://php.net/manual/en/imap.constants.php
+     *
+     * @see http://php.net/manual/en/imap.constants.php
      */
-    public const IMAP_GC_ELT = 1;
+    public const int IMAP_GC_ELT = 1;
 
     /**
-     * Garbage collector, clear envelopes and bodies.
-     * @link http://php.net/manual/en/imap.constants.php
+     * Garbage collector, clear envelopes, and bodies.
+     *
+     * @see http://php.net/manual/en/imap.constants.php
      */
-    public const IMAP_GC_ENV = 2;
+    public const int IMAP_GC_ENV = 2;
 
     /**
      * Garbage collector, clear texts.
-     * @link http://php.net/manual/en/imap.constants.php
+     *
+     * @see http://php.net/manual/en/imap.constants.php
      */
-    public const IMAP_GC_TEXTS = 4;
+    public const int IMAP_GC_TEXTS = 4;
 }

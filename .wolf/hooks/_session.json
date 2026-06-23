@@ -1,0 +1,49 @@
+{
+  "session_id": "session-2026-06-22-1813",
+  "started": "2026-06-22T16:13:03.833Z",
+  "files_read": {
+    "/projects/php-imap/src/Support/Masks/AttachmentMask.php": {
+      "count": 1,
+      "tokens": 189,
+      "first_read": "2026-06-22T16:13:21.889Z"
+    },
+    "/projects/php-imap/src/Events/Event.php": {
+      "count": 1,
+      "tokens": 108,
+      "first_read": "2026-06-22T16:13:35.089Z"
+    },
+    "/projects/php-imap/src/Message.php": {
+      "count": 2,
+      "tokens": 10421,
+      "first_read": "2026-06-22T16:19:32.292Z"
+    },
+    "/projects/php-imap/src/Header.php": {
+      "count": 5,
+      "tokens": 5611,
+      "first_read": "2026-06-22T16:19:50.175Z"
+    }
+  },
+  "files_written": [
+    {
+      "file": "/projects/php-imap/src/Support/Masks/AttachmentMask.php",
+      "action": "edit",
+      "tokens": 27,
+      "at": "2026-06-22T16:13:30.114Z"
+    },
+    {
+      "file": "/projects/php-imap/src/Events/Event.php",
+      "action": "edit",
+      "tokens": 140,
+      "at": "2026-06-22T16:13:58.605Z"
+    }
+  ],
+  "edit_counts": {
+    "src/Support/Masks/AttachmentMask.php": 1,
+    "src/Events/Event.php": 1
+  },
+  "anatomy_hits": 4,
+  "anatomy_misses": 0,
+  "repeated_reads_warned": 5,
+  "cerebrum_warnings": 0,
+  "stop_count": 2
+}

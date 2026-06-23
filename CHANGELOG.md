@@ -339,7 +339,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ### Breaking changes
 - Stringified message headers are now separated by ", " instead of " ". 
-- All message header values such as subject, message_id, from, to, etc now consists of an `Àttribute::class` instance (should behave the same way as before, but might cause some problem in certain edge cases)
+- All message header values such as subject, messageId, from, to, etc now consists of an `Àttribute::class` instance (should behave the same way as before, but might cause some problem in certain edge cases)
 - The formal address object "from", "to", etc now consists of an `Address::class` instance  (should behave the same way as before, but might cause some problem in certain edge cases)
 - When fetching or manipulating message flags a `MessageFlagException::class` exception can be thrown if a runtime error occurs
 - Learn more about the new `Attribute` class here: [www.php-imap.com/api/attribute](https://www.php-imap.com/api/attribute)
@@ -376,7 +376,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ### Added
 - Proxy support added 
 - Flexible disposition support added #58
-- New `options.message_key` option `uid` added
+- New `options.messageKey` option `uid` added
 - Protocol UID support added
 - Flexible sequence type support added
 
@@ -472,7 +472,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - Missing variable check added to prevent exception while parsing an address [webklex/laravel-imap #356](https://github.com/Webklex/laravel-imap/issues/356)
 - Missing variable check added to prevent exception while parsing a part subtype #27
 - Missing variable check added to prevent exception while parsing a part content-type [webklex/laravel-imap #356](https://github.com/Webklex/laravel-imap/issues/356)
-- Mixed message header attribute `in_reply_to` "unified" to be always an array  #26
+- Mixed message header attribute `inReplyTo` "unified" to be always an array  #26
 - Potential message moving / copying problem fixed #29
 - Move messages by using `Protocol::moveMessage()` instead of `Protocol::copyMessage()` and `Message::delete()` #29
 
@@ -486,7 +486,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ### Breaking changes
 - Text bodies might no longer get fetched as attachment
-- `Message::$in_reply_to` type changed from mixed to array
+- `Message::$inReplyTo` type changed from mixed to array
 
 ## [2.1.13] - 2020-10-13
 ### Fixed
@@ -679,7 +679,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - Message null value attribute problem fixed
 - Client connection path handling changed to be handled inside the calling method #31
 - iconv(): error suppressor for //IGNORE added #184
-- Typo Folder attribute fullName changed to full_name
+- Typo Folder attribute fullName changed to fullName
 - Query scope error fixed #153
 - Replace embedded image with URL #151
 - Fix sender name in non-latin emails sent from Gmail (#155)
@@ -713,7 +713,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ### Breaking changes
 - Message::moveToFolder() returns either a Message::class instance or null and not a boolean
-- Folder::fullName is now Folder::full_name
+- Folder::fullName is now Folder::fullName
 - Attachment::image_src might no longer work as expected - use Attachment::getImageSrc() instead
 
 ### Affected Classes

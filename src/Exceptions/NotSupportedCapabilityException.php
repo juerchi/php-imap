@@ -1,4 +1,5 @@
 <?php
+
 /*
 * File:     RuntimeException.php
 * Category: Exception
@@ -12,13 +13,7 @@
 
 namespace Webklex\PHPIMAP\Exceptions;
 
-use Exception;
-
 /**
- * Class NotSupportedCapabilityException
- *
- * @package Webklex\PHPIMAP\Exceptions
+ * Class NotSupportedCapabilityException.
  */
-class NotSupportedCapabilityException extends Exception
-{
-}
+class NotSupportedCapabilityException extends \Exception {}

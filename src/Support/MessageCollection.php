@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 /*
 * File:     MessageCollection.php
 * Category: Collection
@@ -12,11 +15,12 @@
 
 namespace Webklex\PHPIMAP\Support;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Webklex\PHPIMAP\Message;
+
 /**
- * Class MessageCollection
+ * Class MessageCollection.
  *
- * @package Webklex\PHPIMAP\Support
+ * @template-extends ArrayCollection<string|int, Message>
  */
-class MessageCollection extends PaginatedCollection
-{
-}
+final class MessageCollection extends ArrayCollection {}

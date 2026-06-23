@@ -1,4 +1,5 @@
 <?php
+
 /*
 * File: HasEvents.php
 * Category: -
@@ -16,26 +17,23 @@ use Webklex\PHPIMAP\Events\Event;
 use Webklex\PHPIMAP\Exceptions\EventNotFoundException;
 
 /**
- * Trait HasEvents
+ * Trait HasEvents.
  *
- * @package Webklex\PHPIMAP\Traits
+ * @phpstan-type EventMap array<string, array<string, class-string<Event>|Event>>
  */
 trait HasEvents
 {
     /**
-     * Event holder
+     * Event holder.
      *
-     * @var array $events
+     * @var EventMap
      */
-    protected $events = [];
+    protected array $events = [];
 
     /**
-     * Set a specific event
-     * @param $section
-     * @param $event
-     * @param $class
+     * Set a specific event.
      */
-    public function setEvent($section, $event, $class)
+    public function setEvent(string $section, string $event, mixed $class): void
     {
         if (isset($this->events[$section])) {
             $this->events[$section][$event] = $class;
@@ -43,37 +41,45 @@ trait HasEvents
     }
 
     /**
-     * Set all events
-     * @param $events
+     * Set all events.
+     *
+     * @param EventMap $events
      */
-    public function setEvents($events)
+    public function setEvents(array $events): void
     {
         $this->events = $events;
     }
 
     /**
-     * Get a specific event callback
-     * @param $section
-     * @param $event
+     * Get a specific event callback.
      *
-     * @return Event|string
+     * @phpstan-return class-string<Event>|Event
+     *
      * @throws EventNotFoundException
      */
-    public function getEvent($section, $event)
+    public function getEvent(string $section, string $event): string|Event
     {
-        if (isset($this->events[$section])) {
-            return $this->events[$section][$event];
-        }
-        throw new EventNotFoundException();
+        return $this->events[$section][$event]
+            ?? throw new EventNotFoundException('event not found');
     }
 
     /**
-     * Get all events
+     * Get all events.
      *
-     * @return array
+     * @return EventMap
      */
     public function getEvents(): array
     {
         return $this->events;
+    }
+
+    /**
+     * Dispatch a specific event.
+     * @throws EventNotFoundException
+     */
+    public function dispatch(string $section, string $event, mixed ...$args): void
+    {
+        $event = $this->getEvent($section, $event);
+        $event::dispatch(...$args);
     }
 }

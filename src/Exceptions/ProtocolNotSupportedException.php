@@ -1,4 +1,5 @@
 <?php
+
 /*
 * File:     ProtocolNotSupportedException.php
 * Category: Exception
@@ -12,13 +13,7 @@
 
 namespace Webklex\PHPIMAP\Exceptions;
 
-use Exception;
-
 /**
- * Class ProtocolNotSupportedException
- *
- * @package Webklex\PHPIMAP\Exceptions
+ * Class ProtocolNotSupportedException.
  */
-class ProtocolNotSupportedException extends Exception
-{
-}
+class ProtocolNotSupportedException extends \Exception {}

@@ -1,4 +1,5 @@
 <?php
+
 /*
 * File:     MessageMovedEvent.php
 * Category: Event
@@ -15,25 +16,12 @@ namespace Webklex\PHPIMAP\Events;
 use Webklex\PHPIMAP\Message;
 
 /**
- * Class MessageMovedEvent
- *
- * @package Webklex\PHPIMAP\Events
+ * Class MessageMovedEvent.
  */
 class MessageMovedEvent extends Event
 {
-    /** @var Message $old_message */
-    public $old_message;
-    /** @var Message $new_message */
-    public $new_message;
-
-    /**
-     * Create a new event instance.
-     * @param Message[] $messages
-     * @return void
-     */
-    public function __construct($messages)
-    {
-        $this->old_message = $messages[0];
-        $this->new_message = $messages[1];
-    }
+    public function __construct(
+        public readonly Message $oldMessage,
+        public readonly Message $newMessage,
+    ) {}
 }

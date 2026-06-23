@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 /*
 * File:     FolderCollection.php
 * Category: Collection
@@ -12,11 +15,12 @@
 
 namespace Webklex\PHPIMAP\Support;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Webklex\PHPIMAP\Folder;
+
 /**
- * Class FolderCollection
+ * Class FolderCollection.
  *
- * @package Webklex\PHPIMAP\Support
+ * @template-extends ArrayCollection<int, Folder>
  */
-class FolderCollection extends PaginatedCollection
-{
-}
+final class FolderCollection extends ArrayCollection {}

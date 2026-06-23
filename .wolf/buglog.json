@@ -1,0 +1,867 @@
+{
+  "version": 1,
+  "bugs": [
+    {
+      "id": "bug-001",
+      "timestamp": "2026-06-22T10:51:50.975Z",
+      "error_message": "Incorrect value in code",
+      "file": "src/Connection/Protocols/ImapProtocol.php",
+      "root_cause": "Had '; // define $tokens variable before first use\n   ",
+      "fix": "Changed to 'FLAGS'",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "php"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-22T10:51:50.975Z"
+    },
+    {
+      "id": "bug-002",
+      "timestamp": "2026-06-22T10:52:49.706Z",
+      "error_message": "Wrong return value",
+      "file": "src/Connection/Protocols/ImapProtocol.php",
+      "root_cause": "Was returning: null at end of array */",
+      "fix": "Now returns: null at end of array) */",
+      "tags": [
+        "auto-detected",
+        "return-value",
+        "php"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-22T10:52:49.706Z"
+    },
+    {
+      "id": "bug-003",
+      "timestamp": "2026-06-22T11:04:32.522Z",
+      "error_message": "Wrong return value",
+      "file": "src/Connection/Protocols/ImapProtocol.php",
+      "root_cause": "Was returning: list<string|list<mixed>> */",
+      "fix": "Now returns: list<string|list<mixed>>",
+      "tags": [
+        "auto-detected",
+        "return-value",
+        "php"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-22T11:04:32.522Z"
+    },
+    {
+      "id": "bug-004",
+      "timestamp": "2026-06-22T11:05:50.683Z",
+      "error_message": "Significant refactor of ",
+      "file": "src/Connection/Protocols/ImapProtocol.php",
+      "root_cause": "2 lines replaced/restructured",
+      "fix": "Rewrote 8→17 lines (2 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "php"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-22T11:05:50.683Z"
+    },
+    {
+      "id": "bug-005",
+      "timestamp": "2026-06-22T11:22:26.689Z",
+      "error_message": "Wrong condition in logic",
+      "file": "src/Connection/Protocols/LegacyProtocol.php",
+      "root_cause": "Condition was: if (array_any(\n            [... $messages],\n          )",
+      "fix": "Changed to: if (array_any(\n            [... $messages],\n          )",
+      "tags": [
+        "auto-detected",
+        "logic-fix",
+        "php"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-22T11:22:26.689Z"
+    },
+    {
+      "id": "bug-006",
+      "timestamp": "2026-06-22T13:45:00.000Z",
+      "error_message": "array_first() bekommt Skalar statt Array — Attribute::first() gibt falsches Ergebnis",
+      "file": "src/Attribute.php",
+      "root_cause": "array_first($this->values[0]) übergibt das erste Element (Skalar) statt das gesamte Array",
+      "fix": "Geändert zu array_first($this->values)",
+      "tags": [
+        "logic-error",
+        "attribute",
+        "array"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-22T13:45:00.000Z"
+    },
+    {
+      "id": "bug-007",
+      "timestamp": "2026-06-22T13:45:00.000Z",
+      "error_message": "Message::get('size') konnte fetchSize() nie aufrufen — size blieb immer null",
+      "file": "src/Message.php",
+      "root_cause": "Redundanter isset()-Check im 'size'-Case — da der äußere isset() zuerst prüft und früh zurückkehrt, ist der innere Check im Case immer false",
+      "fix": "Inneren isset()-Check im 'size'-Case entfernt; fetchSize() wird nun direkt aufgerufen",
+      "tags": [
+        "logic-error",
+        "message",
+        "size"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-22T13:45:00.000Z"
+    },
+    {
+      "id": "bug-008",
+      "timestamp": "2026-06-22T13:45:00.000Z",
+      "error_message": "Message::peek() verwendet == / != statt === / !== bei null-Vergleichen",
+      "file": "src/Message.php",
+      "root_cause": "Loose comparison kann bei bestimmten Flag-Werten (leerer String, '0') falsche Ergebnisse liefern",
+      "fix": "== null zu === null und != null zu !== null geändert (Yoda-Style)",
+      "tags": [
+        "logic-error",
+        "message",
+        "flags",
+        "comparison"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-22T13:45:00.000Z"
+    },
+    {
+      "id": "bug-009",
+      "timestamp": "2026-06-22T13:45:00.000Z",
+      "error_message": "Message::thread() übergibt Attribute-Objekt als string $in_reply_to",
+      "file": "src/Message.php",
+      "root_cause": "$this->message_id ist ein Attribute-Objekt; fetchThreadByInReplyTo() erwartet string — ohne ->first() wird __toString() mit allen Werten durch ', ' verbunden",
+      "fix": "$this->message_id->first() übergeben statt $this->message_id",
+      "tags": [
+        "logic-error",
+        "message",
+        "thread",
+        "attribute"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-22T13:45:00.000Z"
+    },
+    {
+      "id": "bug-010",
+      "timestamp": "2026-06-22T13:45:00.000Z",
+      "error_message": "Message::is() verwendet loose == statt === für uid, message_id und subject",
+      "file": "src/Message.php",
+      "root_cause": "Loose comparison zwischen int/string-Werten kann unbeabsichtigte Gleichheit erzeugen (z.B. 0 == 'foo')",
+      "fix": "Alle drei Vergleiche auf === geändert",
+      "tags": [
+        "logic-error",
+        "message",
+        "comparison"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-22T13:45:00.000Z"
+    },
+    {
+      "id": "bug-011",
+      "timestamp": "2026-06-22T12:20:47.445Z",
+      "error_message": "Wrong condition in logic",
+      "file": "src/Connection/Protocols/ImapProtocol.php",
+      "root_cause": "Condition was: if ($tokens[2][$uidKey] != $msgUid)",
+      "fix": "Changed to: if ($tokens[2][$uidKey] !== $msgUid)",
+      "tags": [
+        "auto-detected",
+        "logic-fix",
+        "php"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-22T12:20:47.445Z"
+    },
+    {
+      "id": "bug-012",
+      "timestamp": "2026-06-22T14:17:00.000Z",
+      "error_message": "Query::populate() ruft $message->getHeader()->set() vor null-Check auf",
+      "file": "src/Query/Query.php",
+      "root_cause": "make() kann null zurückgeben; der Extensions-Loop und getMessageKey()-Aufruf lagen außerhalb des null-Guards",
+      "fix": "Extensions-Loop und messages->set() in den null !== $message Block verschoben",
+      "tags": [
+        "logic-error",
+        "null-guard",
+        "query"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-22T14:17:00.000Z"
+    },
+    {
+      "id": "bug-013",
+      "timestamp": "2026-06-22T14:19:00.000Z",
+      "error_message": "ImapProtocol::resolveMessageId() (ehem. x()) — Parameter-Reihenfolge vertauscht in Zeile 729",
+      "file": "src/Connection/Protocols/ImapProtocol.php",
+      "root_cause": "Aufruf $this->x($tokens, $uidKey, $uid) hatte $uidKey und $uid vertauscht; Methode erwartet ($tokens, $uid, $uidKey)",
+      "fix": "Parameter-Reihenfolge korrigiert: $this->resolveMessageId($tokens, $uid, $uidKey); Methode von x() in resolveMessageId() umbenannt",
+      "tags": [
+        "logic-error",
+        "parameter-order",
+        "imap-protocol"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-22T14:19:00.000Z"
+    },
+    {
+      "id": "bug-014",
+      "timestamp": "2026-06-22T14:20:00.000Z",
+      "error_message": "ImapProtocol::fetchOneByUid() verwendet != statt !== für UID-Vergleich",
+      "file": "src/Connection/Protocols/ImapProtocol.php",
+      "root_cause": "Loose comparison != kann bei numerischen Strings unbeabsichtigt übereinstimmen",
+      "fix": "!= zu !== geändert",
+      "tags": [
+        "logic-error",
+        "comparison",
+        "imap-protocol"
+      ],
+      "related_bugs": [
+        "bug-011"
+      ],
+      "occurrences": 1,
+      "last_seen": "2026-06-22T14:20:00.000Z"
+    },
+    {
+      "id": "bug-015",
+      "timestamp": "2026-06-22T14:21:00.000Z",
+      "error_message": "Query::getByUidLowerThan() ist identisches Duplikat von getByUidLower() mit falschem Docblock",
+      "file": "src/Query/Query.php",
+      "root_cause": "Beide Methoden verwendeten $id < $uid; getByUidLowerThan() sollte 'lower than or equal' sein; Docblock behauptete fälschlicherweise 'greater than'",
+      "fix": "Bedingung auf $id <= $uid korrigiert; Docblock auf 'lower than or equal to' angepasst",
+      "tags": [
+        "logic-error",
+        "duplicate",
+        "query",
+        "docblock"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-22T14:21:00.000Z"
+    },
+    {
+      "id": "bug-016",
+      "timestamp": "2026-06-22T12:33:23.583Z",
+      "error_message": "Null/undefined access in ",
+      "file": "src/Part.php",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check)",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "php"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-22T12:33:23.583Z"
+    },
+    {
+      "id": "bug-017",
+      "timestamp": "2026-06-22T12:39:35.996Z",
+      "error_message": "Incorrect value in code",
+      "file": "src/Query/WhereQuery.php",
+      "root_cause": "Had \"Content-Language $country_code\"",
+      "fix": "Changed to \"Content-Language\"",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "php"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-22T12:39:35.996Z"
+    },
+    {
+      "id": "bug-018",
+      "timestamp": "2026-06-22T12:41:36.362Z",
+      "error_message": "Wrong return value",
+      "file": "src/Query/WhereQuery.php",
+      "root_cause": "Was returning: $this->where('FLAGGED', $value);",
+      "fix": "Now returns: $this->where('FLAGGED');",
+      "tags": [
+        "auto-detected",
+        "return-value",
+        "php"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-22T12:41:36.362Z"
+    },
+    {
+      "id": "bug-019",
+      "timestamp": "2026-06-22T12:54:47.425Z",
+      "error_message": "Wrong operator: !== should be ===",
+      "file": "src/Client.php",
+      "root_cause": "Used \"!==\" instead of \"===\"",
+      "fix": "Changed operator !== → ===",
+      "tags": [
+        "auto-detected",
+        "operator-fix",
+        "php"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-22T12:54:47.425Z"
+    },
+    {
+      "id": "bug-020",
+      "timestamp": "2026-06-22T12:59:30.256Z",
+      "error_message": "Null/undefined access in ",
+      "file": "src/Query/WhereQuery.php",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check)",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "php"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-22T12:59:30.256Z"
+    },
+    {
+      "id": "bug-016",
+      "timestamp": "2026-06-22T14:35:00.000Z",
+      "error_message": "Part::parse() weist ->first() (kann null sein) direkt an string $charset zu -> TypeError",
+      "file": "src/Part.php",
+      "root_cause": "Attribute::first() gibt null zurueck wenn keine Werte vorhanden; string-Property akzeptiert kein null",
+      "fix": "$this->charset = $this->header->get(charset)->first() ?? utf-8",
+      "tags": [
+        "logic-error",
+        "null-guard",
+        "part",
+        "attribute"
+      ],
+      "related_bugs": [
+        "bug-006"
+      ],
+      "occurrences": 1,
+      "last_seen": "2026-06-22T14:35:00.000Z"
+    },
+    {
+      "id": "bug-017",
+      "timestamp": "2026-06-22T14:35:00.000Z",
+      "error_message": "WhereQuery::whereLanguage() baut ungueltige Criteria -> wirft immer InvalidWhereQueryCriteriaException",
+      "file": "src/Query/WhereQuery.php",
+      "root_cause": "Content-Language $code ohne CUSTOM-Prefix besteht validate_criteria() nicht",
+      "fix": "whereHeader(Content-Language, $country_code) verwenden",
+      "tags": [
+        "logic-error",
+        "where-query",
+        "imap"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-22T14:35:00.000Z"
+    },
+    {
+      "id": "bug-018",
+      "timestamp": "2026-06-22T14:35:00.000Z",
+      "error_message": "WhereQuery::whereFlagged(string $value) — FLAGGED ist valueless in IMAP, erzeugt invalide Query",
+      "file": "src/Query/WhereQuery.php",
+      "root_cause": "FLAGGED hat keinen Argument-Wert in RFC 3501; zwingender Parameter fuehrt zu FLAGGED somevalue",
+      "fix": "Parameter entfernt: whereFlagged(): self { return $this->where(FLAGGED); }",
+      "tags": [
+        "logic-error",
+        "where-query",
+        "imap",
+        "flagged"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-22T14:35:00.000Z"
+    },
+    {
+      "id": "bug-019",
+      "timestamp": "2026-06-22T14:35:00.000Z",
+      "error_message": "Client::createFolder() kann null zurueckgeben obwohl Return-Type :Folder ist -> TypeError",
+      "file": "src/Client.php",
+      "root_cause": "getFolderByPath() gibt ?Folder zurueck; kein null-Guard vor return $folder",
+      "fix": "Null-Check mit FolderFetchingException eingebaut",
+      "tags": [
+        "logic-error",
+        "null-guard",
+        "client"
+      ],
+      "related_bugs": [
+        "bug-012"
+      ],
+      "occurrences": 1,
+      "last_seen": "2026-06-22T14:35:00.000Z"
+    },
+    {
+      "id": "bug-020",
+      "timestamp": "2026-06-22T14:35:00.000Z",
+      "error_message": "Folder::decodeName() gibt mb_convert_encoding() direkt zurueck — kann false bei Fehler sein",
+      "file": "src/Folder.php",
+      "root_cause": "mb_convert_encoding() gibt false bei Fehler zurueck; string-Property akzeptiert kein false",
+      "fix": "false === $decoded ? $name : $decoded",
+      "tags": [
+        "logic-error",
+        "folder",
+        "encoding"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-22T14:35:00.000Z"
+    },
+    {
+      "id": "bug-021",
+      "timestamp": "2026-06-22T14:35:00.000Z",
+      "error_message": "Header::rfc822_parse_headers() greift mit $line[0] auf leere Strings zu -> Warning",
+      "file": "src/Header.php",
+      "root_cause": "explode() produziert leere Strings fuer blank lines; kein Guard davor",
+      "fix": "if empty($line) continue vor dem $line[0]-Zugriff eingefuegt",
+      "tags": [
+        "logic-error",
+        "header",
+        "string-index"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-22T14:35:00.000Z"
+    },
+    {
+      "id": "bug-027",
+      "timestamp": "2026-06-22T13:15:53.684Z",
+      "error_message": "Wrong reference: $this should be $val",
+      "file": "src/Connection/Protocols/AbstractProtocol.php",
+      "root_cause": "Used \"$this\" instead of \"$val\"",
+      "fix": "Changed $this → $val",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "php"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-22T13:15:53.684Z"
+    },
+    {
+      "id": "bug-028",
+      "timestamp": "2026-06-22T13:23:28.920Z",
+      "error_message": "Wrong return value",
+      "file": "src/DateParser.php",
+      "root_cause": "Was returning: \\DateTimeImmutable::createFromFormat(\"d M Y H:i:s ",
+      "fix": "Now returns: $parsed;",
+      "tags": [
+        "auto-detected",
+        "return-value",
+        "php"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-06-22T13:24:02.347Z"
+    },
+    {
+      "id": "bug-029",
+      "timestamp": "2026-06-22T13:24:13.418Z",
+      "error_message": "Wrong condition in logic",
+      "file": "src/DateParser.php",
+      "root_cause": "Condition was: if (\n            preg_match('/([A-Z]{2,3}, \\d{1,2} [A-)",
+      "fix": "Changed to: if (false !== $parsed)",
+      "tags": [
+        "auto-detected",
+        "logic-fix",
+        "php"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-22T13:24:13.418Z"
+    },
+    {
+      "id": "bug-030",
+      "timestamp": "2026-06-22T13:28:05.565Z",
+      "error_message": "Wrong condition in logic",
+      "file": "src/Structure.php",
+      "root_cause": "Condition was: if ($ctx !== \"--\" && $ctx != \"\")",
+      "fix": "Changed to: if ($ctx !== \"--\" && $ctx !== \"\")",
+      "tags": [
+        "auto-detected",
+        "logic-fix",
+        "php"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-22T13:28:05.565Z"
+    },
+    {
+      "id": "bug-022",
+      "timestamp": "2026-06-22T15:10:00.000Z",
+      "error_message": "AbstractProtocol::setProxy() schreibt Literal-String key statt Variable $key -> Proxy-Config wird auf null gesetzt",
+      "file": "src/Connection/Protocols/AbstractProtocol.php",
+      "root_cause": "$this->proxy[\"key\"] statt $this->proxy[$key] — Tippfehler; existierender Wert waere $val",
+      "fix": "$this->proxy[$key] = $options[$key] ?? $val",
+      "tags": [
+        "logic-error",
+        "typo",
+        "proxy",
+        "abstract-protocol"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-22T15:10:00.000Z"
+    },
+    {
+      "id": "bug-023",
+      "timestamp": "2026-06-22T15:10:00.000Z",
+      "error_message": "LegacyProtocol::connect() ruft defaultPort() auf potenziell null auf",
+      "file": "src/Connection/Protocols/LegacyProtocol.php",
+      "root_cause": "$this->encryption ist ?Encryption; kein null-safe operator",
+      "fix": "$this->encryption?->defaultPort() ?? 143",
+      "tags": [
+        "logic-error",
+        "null-guard",
+        "legacy-protocol"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-22T15:10:00.000Z"
+    },
+    {
+      "id": "bug-024",
+      "timestamp": "2026-06-22T15:10:00.000Z",
+      "error_message": "LegacyProtocol::setProtocol() strippt legacy- Prefix nie — strpos > 0 verfehlt Position 0",
+      "file": "src/Connection/Protocols/LegacyProtocol.php",
+      "root_cause": "strpos(\"legacy-imap\", \"legacy\") gibt 0 zurueck; 0 > 0 ist false",
+      "fix": "str_starts_with + substr(protocol, strlen(\"legacy-\"))",
+      "tags": [
+        "logic-error",
+        "strpos",
+        "legacy-protocol",
+        "protocol-name"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-22T15:10:00.000Z"
+    },
+    {
+      "id": "bug-025",
+      "timestamp": "2026-06-22T15:10:00.000Z",
+      "error_message": "LegacyProtocol::login() greift auf $status[\"exists\"] zu ohne false-Guard",
+      "file": "src/Connection/Protocols/LegacyProtocol.php",
+      "root_cause": "examineFolder() gibt false|array zurueck; kein false-Check vor Array-Zugriff",
+      "fix": "false === $status || $status[\"exists\"] !== 0",
+      "tags": [
+        "logic-error",
+        "null-guard",
+        "legacy-protocol"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-22T15:10:00.000Z"
+    },
+    {
+      "id": "bug-026",
+      "timestamp": "2026-06-22T15:10:00.000Z",
+      "error_message": "DateParser::parse() gibt createFromFormat() direkt zurueck — kann false bei Formatfehler sein",
+      "file": "src/DateParser.php",
+      "root_cause": "DateTimeImmutable::createFromFormat() gibt false zurueck bei Mismatch; Return-Type ist :DateTimeImmutable",
+      "fix": "false !== $parsed Guard vor jedem return; bei false weiterfall in naechsten Zweig",
+      "tags": [
+        "logic-error",
+        "date-parser",
+        "false-return",
+        "createFromFormat"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-22T15:10:00.000Z"
+    },
+    {
+      "id": "bug-027",
+      "timestamp": "2026-06-22T15:10:00.000Z",
+      "error_message": "HasEvents::getEvent() prueft nur Section-Key, nicht Event-Key",
+      "file": "src/Traits/HasEvents.php",
+      "root_cause": "isset($this->events[$section]) ohne $event-Key-Pruefung; fehlender Event gibt null zurueck",
+      "fix": "isset($this->events[$section][$event]) oder ?? throw pattern",
+      "tags": [
+        "logic-error",
+        "events",
+        "has-events"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-22T15:10:00.000Z"
+    },
+    {
+      "id": "bug-028",
+      "timestamp": "2026-06-22T15:10:00.000Z",
+      "error_message": "LegacyProtocol::getShortPath() greift auf $preg[2] ohne Match-Pruefung zu",
+      "file": "src/Connection/Protocols/LegacyProtocol.php",
+      "root_cause": "preg_match Rueckgabe nicht geprueft; bei keinem Match ist $preg leer",
+      "fix": "if (preg_match(...) !== 1) { return $name; }",
+      "tags": [
+        "logic-error",
+        "preg-match",
+        "legacy-protocol"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-22T15:10:00.000Z"
+    },
+    {
+      "id": "bug-038",
+      "timestamp": "2026-06-22T14:09:40.439Z",
+      "error_message": "Wrong return value",
+      "file": "src/Folder.php",
+      "root_cause": "Was returning: false at runtime despite PHPDoc) */",
+      "fix": "Now returns: mb_convert_encoding($name, 'UTF-8', 'UTF7-IMAP');",
+      "tags": [
+        "auto-detected",
+        "return-value",
+        "php"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-22T14:09:40.439Z"
+    },
+    {
+      "id": "bug-039",
+      "timestamp": "2026-06-22T14:30:41.321Z",
+      "error_message": "Wrong condition in logic",
+      "file": "src/Connection/Protocols/ImapProtocol.php",
+      "root_cause": "Condition was: if ($tokens[2][0] == $item)",
+      "fix": "Changed to: if ($tokens[2][0] === $item)",
+      "tags": [
+        "auto-detected",
+        "logic-fix",
+        "php"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-22T14:30:41.321Z"
+    },
+    {
+      "id": "bug-040",
+      "timestamp": "2026-06-22T14:39:05.058Z",
+      "error_message": "Wrong reference: default_account_config should be defaultAccountConfig",
+      "file": "src/Client.php",
+      "root_cause": "Used \"default_account_config\" instead of \"defaultAccountConfig\"",
+      "fix": "Changed default_account_config → defaultAccountConfig",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "php"
+      ],
+      "related_bugs": [],
+      "occurrences": 5,
+      "last_seen": "2026-06-22T14:39:38.737Z"
+    },
+    {
+      "id": "bug-041",
+      "timestamp": "2026-06-22T14:39:49.506Z",
+      "error_message": "Wrong reference: folder_path should be folderPath",
+      "file": "src/Message.php",
+      "root_cause": "Used \"folder_path\" instead of \"folderPath\"",
+      "fix": "Changed folder_path → folderPath",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "php"
+      ],
+      "related_bugs": [],
+      "occurrences": 8,
+      "last_seen": "2026-06-22T14:41:52.274Z"
+    },
+    {
+      "id": "bug-042",
+      "timestamp": "2026-06-22T14:39:54.391Z",
+      "error_message": "Wrong reference: raw_query should be rawQuery",
+      "file": "src/Query/Query.php",
+      "root_cause": "Used \"raw_query\" instead of \"rawQuery\"",
+      "fix": "Changed raw_query → rawQuery",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "php"
+      ],
+      "related_bugs": [],
+      "occurrences": 8,
+      "last_seen": "2026-06-22T14:41:34.101Z"
+    },
+    {
+      "id": "bug-043",
+      "timestamp": "2026-06-22T15:03:50.869Z",
+      "error_message": "Wrong reference: part_number should be partNumber",
+      "file": "src/Attachment.php",
+      "root_cause": "Used \"part_number\" instead of \"partNumber\"",
+      "fix": "Changed part_number → partNumber",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "php"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-22T15:03:50.869Z"
+    },
+    {
+      "id": "bug-044",
+      "timestamp": "2026-06-22T15:07:15.564Z",
+      "error_message": "Wrong return value",
+      "file": "src/Traits/HasEvents.php",
+      "root_cause": "Was returning: array<class-string<Event>|Event>",
+      "fix": "Now returns: EventMap",
+      "tags": [
+        "auto-detected",
+        "return-value",
+        "php"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-22T15:07:15.564Z"
+    },
+    {
+      "id": "bug-045",
+      "timestamp": "2026-06-22T15:08:39.762Z",
+      "error_message": "Wrong reference: message_id should be messageId",
+      "file": "src/Message.php",
+      "root_cause": "Used \"message_id\" instead of \"messageId\"",
+      "fix": "Changed message_id → messageId",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "php"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-22T15:08:39.762Z"
+    },
+    {
+      "id": "bug-046",
+      "timestamp": "2026-06-22T15:28:32.737Z",
+      "error_message": "Wrong reference: content_type should be contentType",
+      "file": "src/Attachment.php",
+      "root_cause": "Used \"content_type\" instead of \"contentType\"",
+      "fix": "Changed content_type → contentType",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "php"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-22T15:28:32.737Z"
+    },
+    {
+      "id": "bug-047",
+      "timestamp": "2026-06-22T15:33:39.011Z",
+      "error_message": "Wrong reference: $message_key should be $messageKey",
+      "file": "src/Query/Query.php",
+      "root_cause": "Used \"$message_key\" instead of \"$messageKey\"",
+      "fix": "Changed $message_key → $messageKey",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "php"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-22T15:33:39.011Z"
+    },
+    {
+      "id": "bug-048",
+      "timestamp": "2026-06-22T15:52:23.992Z",
+      "error_message": "Incorrect value in code",
+      "file": "src/config/imap.php",
+      "root_cause": "Had 'validateCert'",
+      "fix": "Changed to 'validate_cert'",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "php"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-22T15:52:23.992Z"
+    },
+    {
+      "id": "bug-049",
+      "timestamp": "2026-06-22T15:52:37.281Z",
+      "error_message": "Incorrect value in code",
+      "file": "src/Client.php",
+      "root_cause": "Had 'validateCert'",
+      "fix": "Changed to 'validate_cert'",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "php"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-22T15:52:37.281Z"
+    },
+    {
+      "id": "bug-050",
+      "timestamp": "2026-06-22T16:10:24.836Z",
+      "error_message": "Wrong reference: snake should be camel",
+      "file": "src/Attachment.php",
+      "root_cause": "Used \"snake\" instead of \"camel\"",
+      "fix": "Changed snake → camel",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "php"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-22T16:10:24.836Z"
+    },
+    {
+      "id": "bug-051",
+      "timestamp": "2026-06-22T16:10:34.430Z",
+      "error_message": "Incorrect value in code",
+      "file": "src/Attachment.php",
+      "root_cause": "Had 'img_src'",
+      "fix": "Changed to 'imgSrc'",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "php"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-22T16:10:34.430Z"
+    },
+    {
+      "id": "bug-052",
+      "timestamp": "2026-06-22T16:11:16.961Z",
+      "error_message": "Wrong reference: snake should be camel",
+      "file": "src/Message.php",
+      "root_cause": "Used \"snake\" instead of \"camel\"",
+      "fix": "Changed snake → camel",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "php"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-22T16:11:16.961Z"
+    },
+    {
+      "id": "bug-053",
+      "timestamp": "2026-06-22T16:13:30.116Z",
+      "error_message": "Wrong reference: content_type should be contentType",
+      "file": "src/Support/Masks/AttachmentMask.php",
+      "root_cause": "Used \"content_type\" instead of \"contentType\"",
+      "fix": "Changed content_type → contentType",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "php"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-22T16:13:30.116Z"
+    }
+  ]
+}
