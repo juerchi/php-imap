@@ -17,6 +17,7 @@ use Symfony\Component\Mime\MimeTypes;
 use Symfony\Component\String\UnicodeString;
 use Webklex\PHPIMAP\Exceptions\MaskNotFoundException;
 use Webklex\PHPIMAP\Exceptions\MethodNotFoundException;
+use Webklex\PHPIMAP\Support\MimeHeader;
 
 /**
  * Class Attachment.
@@ -136,13 +137,8 @@ final class Attachment
      */
     public function setName(?string $name): void
     {
-        $decoder = $this->config['decoder']['attachment'];
         if (null !== $name) {
-            if ('utf-8' === $decoder && extension_loaded('imap')) {
-                $this->name = \imap_utf8($name);
-            } else {
-                $this->name = mb_decode_mimeheader($name);
-            }
+            $this->name = MimeHeader::decode($name);
         }
     }
 
