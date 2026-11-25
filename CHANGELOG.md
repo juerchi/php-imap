@@ -11,8 +11,12 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ### Added
 - NaN
 
+### Removed
+- `LegacyProtocol` and all `ext-imap` / pop3 support
+
 ### Breaking changes
-- NaN
+- The legacy protocol (`LegacyProtocol`, based on `ext-imap`) has been removed completely. Only the native `imap` protocol (`imap`, `imap4`, `imap4rev1`) is supported. Using `legacy-imap`, `pop3`, `nntp` or any other protocol now throws a `ConnectionFailedException` caused by a `ProtocolNotSupportedException`.
+- `ext-imap` is no longer suggested in `composer.json`.
 
 
 ## [4.1.2] - 2022-12-14

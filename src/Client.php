@@ -18,7 +18,6 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\String\UnicodeString;
 use Webklex\PHPIMAP\Connection\Protocols\AbstractProtocol;
 use Webklex\PHPIMAP\Connection\Protocols\ImapProtocol;
-use Webklex\PHPIMAP\Connection\Protocols\LegacyProtocol;
 use Webklex\PHPIMAP\Enums\Encryption;
 use Webklex\PHPIMAP\Exceptions\AuthFailedException;
 use Webklex\PHPIMAP\Exceptions\ConnectionFailedException;
@@ -246,23 +245,16 @@ final class Client
         $protocol = strtolower($this->protocol);
         $encryption = null !== $this->encryption ? Encryption::tryFrom(strtolower($this->encryption)) : null;
 
-        if (in_array($protocol, ['imap', 'imap4', 'imap4rev1'])) {
-            $this->connection = new ImapProtocol($this->validateCert, $encryption);
-            $this->connection->connectionTimeout = $this->timeout;
-            $this->connection->setProxy($this->proxy);
-        } else {
-            if (false === extension_loaded('imap')) {
-                throw new ConnectionFailedException(
-                    'connection setup failed',
-                    previous: new ProtocolNotSupportedException($protocol.' is an unsupported protocol')
-                );
-            }
-            $this->connection = new LegacyProtocol($this->validateCert, $encryption);
-            if (str_starts_with($protocol, 'legacy-')) {
-                $protocol = substr($protocol, 7);
-            }
-            $this->connection->setProtocol($protocol);
+        if (!in_array($protocol, ['imap', 'imap4', 'imap4rev1'], true)) {
+            throw new ConnectionFailedException(
+                'connection setup failed',
+                previous: new ProtocolNotSupportedException($protocol.' is an unsupported protocol')
+            );
         }
+
+        $this->connection = new ImapProtocol($this->validateCert, $encryption);
+        $this->connection->connectionTimeout = $this->timeout;
+        $this->connection->setProxy($this->proxy);
         $this->connection->logger = $this->logger;
 
         if (ClientManager::get('options.debug')) {
