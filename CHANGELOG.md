@@ -5,14 +5,31 @@ All notable changes to `webklex/php-imap` will be documented in this file.
 Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) principles.
 
 ## [UNRELEASED]
+
+
+## [9.0.0] - 2026-11-25
 ### Fixed
-- NaN
+- `Attribute::__toString()` no longer throws for `DateTimeImmutable` values (regression of the Carbon removal; parsing any header with a `Date` failed)
+- Encoded words in subjects and address names are now decoded without `ext-imap` as well (all charsets, Q and B encoding). Before, only UTF-8 subjects were decoded and address names stayed encoded
+- Address headers without `ext-imap` no longer throw a `TypeError` for addresses without a host or for groups such as `undisclosed-recipients:;`, and no longer lose members of groups or keep quotes around display names
+- Headers with bare `\n` line endings are parsed correctly. Before, the whole header block ended up in the first value
+- Multiple `Subject:` headers: the first one is used (as before with `ext-imap`) instead of joining all of them
+- Raw 8-bit characters next to (or without) encoded words in subjects, address names and attachment names are kept instead of being replaced by `?` (e.g. `"Müller, Hans" <h@example.com>` became `M??ller, Hans`)
+- Content with `Content-Transfer-Encoding: binary` is returned unchanged without `ext-imap` as well. Before, it was base64-decoded and came out corrupted
 
 ### Added
-- NaN
+- `Support\AddressListParser`: pure PHP RFC 5322 address list parser (groups, quoted names, comments, source routes) whose result matches `imap_rfc822_parse_headers()`. `reply_to`, `sender`, `reply_toaddress` and `senderaddress` fall back to `from` like c-client does
+
+### Removed
+- `LegacyProtocol` and all `ext-imap` / pop3 support
 
 ### Breaking changes
-- NaN
+- The legacy protocol (`LegacyProtocol`, based on `ext-imap`) has been removed completely. Only the native `imap` protocol (`imap`, `imap4`, `imap4rev1`) is supported. Using `legacy-imap`, `pop3`, `nntp` or any other protocol now throws a `ConnectionFailedException` caused by a `ProtocolNotSupportedException`.
+- `ext-imap` is no longer suggested in `composer.json`.
+- The minimum PHP version is now 8.4.28 (older 8.4 releases ship an mbstring that keeps whitespace between adjacent encoded words).
+- Header parsing no longer uses `imap_rfc822_parse_headers()` nor `mailparse_rfc822_parse_addresses()`. The `options.rfc822` config option has been removed (ignored if still set), so parsing results no longer depend on loaded extensions.
+- The `decoder.attachment` config key is no longer used, attachment names are always decoded with `Support\MimeHeader::decode()`.
+- Header values and attachment names are always decoded with `Support\MimeHeader::decode()` (`mb_decode_mimeheader()` for the encoded words only) (or `iconv_mime_decode()` if the message decoder is set to `iconv`), with and without `ext-imap`. `imap_utf8()` and `imap_mime_header_decode()` are no longer used. The `utf-8` decoder option is now an alias of `mimeheader`; its result is NFC instead of the decomposed NFD form `imap_utf8()` returned.
 
 
 ## [4.1.2] - 2022-12-14

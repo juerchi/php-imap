@@ -62,7 +62,7 @@ return [
         'default' => [// account identifier
             'host' => 'localhost',
             'port' => 993,
-            'protocol' => 'imap', // might also use imap, [pop3 or nntp (untested)]
+            'protocol' => 'imap', // Supported: imap, imap4, imap4rev1
             'encryption' => 'ssl', // Supported: false, 'ssl', 'tls'
             'validate_cert' => true,
             'username' => 'root@example.com',
@@ -122,9 +122,6 @@ return [
     |       Default TRUE
     |   -Soft fail
     |       Default FALSE - Set to TRUE if you want to ignore certain exception while fetching bulk messages
-    |   -RFC822
-    |       Default TRUE - Set to FALSE to prevent the usage of \imap_rfc822_parse_headers().
-    |                      See https://github.com/Webklex/php-imap/issues/115 for more information.
     |   -Debug enable to trace communication traffic
     |   -UID cache enable the UID cache
     |   -Fallback date is used if the given message date could not be parsed
@@ -149,9 +146,10 @@ return [
     |                               error: "Kerberos error: No credentials cache
     |                               file found (try running kinit) (...)"
     |                               or ['GSSAPI','PLAIN'] if you are using outlook mail
-    |   -Decoder options (currently only the message subject and attachment name decoder can be set)
-    |       'utf-8' - Uses imap_utf8($string) to decode a string
-    |       'mimeheader' - Uses mb_decode_mimeheader($string) to decode a string
+    |   -Decoder options (currently only the message header decoder can be set, attachment names are always
+    |       decoded using Support\MimeHeader::decode())
+    |       'utf-8' / 'mimeheader' - Uses mb_decode_mimeheader($string) to decode a string (default)
+    |       'iconv' - Uses iconv_mime_decode($string) to decode a string (message subject only)
     |
     */
     'options' => [
@@ -161,7 +159,6 @@ return [
         'fetch_body' => true,
         'fetch_flags' => true,
         'soft_fail' => false,
-        'rfc822' => true,
         'debug' => false,
         'uid_cache' => true,
         // 'fallback_date' => "01.01.1970 00:00:00",
@@ -178,7 +175,6 @@ return [
         ],
         'decoder' => [
             'message' => 'utf-8', // mimeheader
-            'attachment' => 'utf-8', // mimeheader
         ],
         'open' => [
             // 'DISABLE_AUTHENTICATOR' => 'GSSAPI'

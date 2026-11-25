@@ -21,6 +21,11 @@ use Webklex\PHPIMAP\Exceptions\InvalidMessageDateException;
 final class Attribute implements \ArrayAccess, \Stringable
 {
     /**
+     * String representation of date values (same output as Carbon's __toString() had).
+     */
+    private const string DATE_STRING_FORMAT = 'Y-m-d H:i:s';
+
+    /**
      * Value holder.
      */
     private array $values = [];
@@ -35,7 +40,12 @@ final class Attribute implements \ArrayAccess, \Stringable
      */
     public function __toString(): string
     {
-        return implode(', ', $this->values);
+        return implode(', ', array_map(
+            static fn (mixed $value): string => $value instanceof \DateTimeInterface
+                ? $value->format(self::DATE_STRING_FORMAT)
+                : (string) $value,
+            $this->values,
+        ));
     }
 
     /**

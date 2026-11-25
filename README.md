@@ -15,8 +15,6 @@
 PHP-IMAP is a wrapper for common IMAP communication without the need to have the php-imap module installed / enabled.
 The protocol is completely integrated and therefore supports IMAP IDLE operation and the "new" oAuth authentication
 process as well.
-You can enable the `php-imap` module in order to handle edge cases, improve message decoding quality and is required if
-you want to use legacy protocols such as pop3.
 
 Official documentation: [php-imap.com](https://www.php-imap.com/)
 
@@ -27,7 +25,6 @@ Discord: [discord.gg/rd4cN9h6][link-discord]
 ## Table of Contents
 - [Documentations](#documentations)
 - [Basic usage example](#basic-usage-example)
-- [Known issues](#known-issues)
 - [Support](#support)
 - [Features & pull requests](#features--pull-requests)
 - [Security](#security)
@@ -84,11 +81,6 @@ foreach($folders as $folder){
 }
 ```
 
-
-### Known issues
-| Error                                                                     | Solution                                                   | 
-| ------------------------------------------------------------------------- | ---------------------------------------------------------- | 
-| Kerberos error: No credentials cache file found (try running kinit) (...) | Uncomment "DISABLE_AUTHENTICATOR" inside your config and use the `legacy-imap` protocol | 
 
 
 ## Support

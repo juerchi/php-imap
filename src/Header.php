@@ -15,6 +15,8 @@ namespace Webklex\PHPIMAP;
 
 use Webklex\PHPIMAP\Exceptions\InvalidMessageDateException;
 use Webklex\PHPIMAP\Exceptions\MethodNotFoundException;
+use Webklex\PHPIMAP\Support\AddressListParser;
+use Webklex\PHPIMAP\Support\MimeHeader;
 
 final class Header
 {
@@ -141,20 +143,12 @@ final class Header
     /**
      * Parse mail headers from a string.
      *
-     * @see https://php.net/manual/en/function.imap-rfc822-parse-headers.php
+     * Pure PHP counterpart of imap_rfc822_parse_headers().
      */
     public function rfc822_parse_headers(string $rawHeaders): object
     {
         $headers = [];
-        $imapHeaders = [];
-        if (extension_loaded('imap') && $this->config['rfc822']) {
-            $rawImapHeaders = (array) \imap_rfc822_parse_headers($this->raw);
-            foreach ($rawImapHeaders as $key => $values) {
-                $key = str_replace('-', '_', $key);
-                $imapHeaders[$key] = $values;
-            }
-        }
-        $lines = explode("\r\n", preg_replace("/\r\n\\s/", ' ', $rawHeaders));
+        $lines = explode("\r\n", preg_replace("/\r\n\\s/", ' ', preg_replace('/\r\n|\r|\n/', "\r\n", $rawHeaders)));
         $prevHeader = null;
         foreach ($lines as $line) {
             if ('' === $line) {
@@ -197,9 +191,6 @@ final class Header
         }
 
         foreach ($headers as $key => $values) {
-            if (isset($imapHeaders[$key])) {
-                continue;
-            }
             $value = null;
 
             switch ($key) {
@@ -215,7 +206,7 @@ final class Header
                     break;
 
                 case 'subject':
-                    $value = implode(' ', $values);
+                    $value = $values[0];
 
                     break;
 
@@ -243,13 +234,23 @@ final class Header
             $headers[$key] = $value;
         }
 
-        return (object) array_merge($headers, $imapHeaders);
+        // like c-client, Reply-To and Sender default to From
+        if ([] !== ($headers['from'] ?? [])) {
+            foreach (['reply_to', 'sender'] as $key) {
+                if (!isset($headers[$key])) {
+                    $headers[$key] = array_map(static fn (object $address): object => clone $address, $headers['from']);
+                    $headers[$key.'address'] = $headers['fromaddress'];
+                }
+            }
+        }
+
+        return (object) $headers;
     }
 
     /**
      * Decode MIME header elements.
      *
-     * @see https://php.net/manual/en/function.imap-mime-header-decode.php
+     * Every encoded word (any charset, Q and B encoding) is resolved using MimeHeader::decode().
      *
      * @param string $text The MIME text
      *
@@ -258,15 +259,11 @@ final class Header
      */
     public function mime_header_decode(string $text): array
     {
-        if (extension_loaded('imap')) {
-            return \imap_mime_header_decode($text) ?: [];
-        }
-        $charset = $this->getEncoding($text);
-
+        // mb_decode_mimeheader() resolves every encoded word (any charset, Q and B) and returns UTF-8
         return [
             (object) [
-                'charset' => $charset,
-                'text' => $this->convertEncoding($text, $charset),
+                'charset' => 'UTF-8',
+                'text' => MimeHeader::decode($text),
             ],
         ];
     }
@@ -393,14 +390,6 @@ final class Header
     }
 
     /**
-     * Test if a given value is utf-8 encoded.
-     */
-    private function is_utf8(string $value): bool
-    {
-        return str_starts_with(strtolower($value), '=?utf-8?');
-    }
-
-    /**
      * Try to decode a specific header.
      */
     private function decode(array|string|null $value): mixed
@@ -413,28 +402,8 @@ final class Header
         $decoder = $this->config['decoder']['message'];
 
         if (null !== $value) {
-            $isUtf8Base = $this->is_utf8($value);
-
-            if ('utf-8' === $decoder && extension_loaded('imap')) {
-                $value = \imap_utf8($value);
-                $isUtf8Base = $this->is_utf8($value);
-                if ($isUtf8Base) {
-                    $value = mb_decode_mimeheader($value);
-                }
-                if ($this->notDecoded($originalValue, $value)) {
-                    $decodedValue = $this->mime_header_decode($value);
-                    if (([] !== $decodedValue) && property_exists($decodedValue[0], 'text')) {
-                        $value = $decodedValue[0]->text;
-                    }
-                }
-            } elseif ('iconv' === $decoder && $isUtf8Base) {
-                $value = iconv_mime_decode($value);
-            } elseif ($isUtf8Base) {
-                $value = mb_decode_mimeheader($value);
-            }
-
-            if ($this->is_utf8($value)) {
-                $value = mb_decode_mimeheader($value);
+            if (str_contains($value, '=?')) {
+                $value = 'iconv' === $decoder ? iconv_mime_decode($value) : MimeHeader::decode($value);
             }
 
             if ($this->notDecoded($originalValue, $value)) {
@@ -485,47 +454,8 @@ final class Header
     {
         $addresses = [];
 
-        if (extension_loaded('mailparse') && $this->config['rfc822']) {
-            foreach ($values as $address) {
-                foreach (\mailparse_rfc822_parse_addresses($address) as $parsedAddress) {
-                    if (isset($parsedAddress['address'])) {
-                        $mailAddress = explode('@', $parsedAddress['address']);
-                        if (2 === count($mailAddress)) {
-                            $addresses[] = (object) [
-                                'personal' => $parsedAddress['display'] ?? '',
-                                'mailbox' => $mailAddress[0],
-                                'host' => $mailAddress[1],
-                            ];
-                        }
-                    }
-                }
-            }
-
-            return $addresses;
-        }
-
         foreach ($values as $address) {
-            foreach (preg_split('/, (?=(?:[^"]*"[^"]*")*[^"]*$)/', $address) as $splitAddress) {
-                $splitAddress = trim(rtrim($splitAddress));
-
-                if (strpos($splitAddress, ',') === strlen($splitAddress) - 1) {
-                    $splitAddress = substr($splitAddress, 0, -1);
-                }
-                if (preg_match(
-                    '/^(?:(?P<name>.+)\s)?(?(name)<|<?)(?P<email>\S+?)(?(name)>|>?)$/',
-                    $splitAddress,
-                    $matches
-                )) {
-                    $name = trim(rtrim($matches['name']));
-                    $email = trim(rtrim($matches['email']));
-                    [$mailbox, $host] = array_pad(explode('@', $email), 2, null);
-                    $addresses[] = (object) [
-                        'personal' => $name,
-                        'mailbox' => $mailbox,
-                        'host' => $host,
-                    ];
-                }
-            }
+            array_push($addresses, ...AddressListParser::parse($address));
         }
 
         return $addresses;

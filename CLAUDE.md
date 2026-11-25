@@ -1,17 +1,10 @@
-# OpenWolf
-
-@.wolf/OPENWOLF.md
-
-This project uses OpenWolf for context management. Read and follow .wolf/OPENWOLF.md every session. Check .wolf/cerebrum.md before generating code. Check .wolf/anatomy.md before reading files.
-
-
 # CLAUDE.md
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Project Overview
 
-PHP-IMAP is a wrapper for common IMAP communication without requiring the php-imap module. It implements the IMAP protocol completely in PHP, supporting IMAP IDLE operations and OAuth authentication. The php-imap extension can be optionally enabled for edge cases and legacy protocols (pop3).
+PHP-IMAP is a wrapper for common IMAP communication without requiring the php-imap module. It implements the IMAP protocol completely in PHP, supporting IMAP IDLE operations and OAuth authentication.
 
 **Official documentation**: https://www.php-imap.com/
 
@@ -24,8 +17,9 @@ composer test
 # OR
 phpunit
 
-# Tests are located in tests/ directory
+# Tests are located in tests/ (tests/Unit/ mirrors src/: Header, AddressListParser/MimeHeader, Attribute, Message)
 # Test configuration: phpunit.xml
+# Tests must pass with and without ext-imap loaded: never make an expectation depend on an extension
 ```
 
 ### Code Quality
@@ -33,17 +27,13 @@ phpunit
 # Run Rector for automated refactoring (targets PHP 8.1)
 vendor/bin/rector process
 
-# Run PHPStan for static analysis
-vendor/bin/phpstan analyse src --level=3  # Recommended: 1 error remaining
-vendor/bin/phpstan analyse src --level=5  # Strict: 57 errors remaining
+# Run PHPStan for static analysis (phpstan.neon sets level 3)
+vendor/bin/phpstan analyse                # Level 3: no errors
+vendor/bin/phpstan analyse src --level=5  # Strict: 5 errors remaining (dead catch/ternary/while, unread $config of Structure)
 
-# PHPStan Status:
-# - Level 3 (critical errors): 1 error (96% reduction from original 23)
-# - Level 5 (strict analysis): 57 errors (72% reduction from original 202)
-# - Most remaining errors are flow analysis issues that can be suppressed
-
-# PHP CS Fixer is available but config is in .php-cs-fixer.cache
-# The project follows PHP CS standards
+# PHP CS Fixer (config: .php-cs-fixer.dist.php, risky rules needed)
+vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.dist.php --allow-risky=yes <changed files>
+# Only pass the files you changed: on the whole tree it reorders properties and reformats unrelated code
 ```
 
 ### Installation
@@ -51,7 +41,7 @@ vendor/bin/phpstan analyse src --level=5  # Strict: 57 errors remaining
 # Install dependencies
 composer install
 
-# Minimum PHP version: 8.2.0
+# Minimum PHP version: 8.4.28
 ```
 
 ## Architecture Overview
@@ -67,9 +57,7 @@ composer install
 **Client** (`src/Client.php`)
 - Main IMAP client class that manages server connections
 - Handles authentication (standard login and OAuth)
-- Supports two protocol implementations:
-  - `ImapProtocol`: Native PHP implementation (default, no extension required)
-  - `LegacyProtocol`: Uses php-imap extension (for legacy protocols like pop3)
+- Uses `ImapProtocol`, the native PHP implementation (no extension required)
 - Connection lifecycle: `connect()` → `authenticate()` → operations → `disconnect()`
 - Manages folder operations via `getFolders()`, `getFolder()`, `createFolder()`
 
@@ -116,7 +104,6 @@ composer install
 **Protocol Implementations** (`src/Connection/Protocols/`)
 - `AbstractProtocol`: Base protocol class
 - `ImapProtocol`: Pure PHP IMAP implementation (no extension needed)
-- `LegacyProtocol`: Wrapper for php-imap extension functions
 - `ProtocolInterface`: Contract for protocol implementations
 
 All protocols handle:
@@ -132,12 +119,20 @@ All protocols handle:
 - `FolderCollection`: Collection of Folder objects
 - `AttachmentCollection`: Collection of Attachment objects
 - `FlagCollection`: Collection of message flags
-- All extend Illuminate's Collection for powerful data manipulation
+- All extend Doctrine's `ArrayCollection`
 
 **Masks** (`src/Support/Masks/`)
 - `MessageMask`: Default message transformation/presentation layer
 - `AttachmentMask`: Default attachment transformation layer
 - Customizable via client configuration for alternative representations
+
+**MimeHeader** (`src/Support/MimeHeader.php`)
+- `MimeHeader::decode()` decodes RFC 2047 encoded words (any charset, Q and B) and leaves the surrounding text untouched
+- Used for subjects, address names and attachment names; `mb_decode_mimeheader()` on a whole value would turn raw 8-bit characters into `?`
+
+**AddressListParser** (`src/Support/AddressListParser.php`)
+- Pure PHP RFC 5322 address list parser used by `Header`; its result is pinned to `imap_rfc822_parse_headers()` (c-client) by `tests/Unit/HeaderAddressTest.php`
+- Missing hosts become `UNKNOWN`, groups yield a start marker, their members and an empty end marker
 
 **Encoding** (`src/EncodingAliases.php`)
 - Maps various character encoding aliases to standard names
@@ -179,7 +174,7 @@ Set `authentication` to 'oauth' and provide OAuth token as password.
 
 Default configuration in `src/config/imap.php` includes:
 - Account credentials and connection settings
-- Protocol selection (imap, legacy-imap, legacy-pop3)
+- Protocol selection (imap)
 - Encryption options (ssl, tls, starttls, notls)
 - Fetch options, sequence types, delimiters
 - Event handlers and custom masks
@@ -212,7 +207,7 @@ $message->delete($expunge = true);
 ## Important Implementation Notes
 
 - The library uses `ClientManager::$config` as a static configuration store
-- Protocols are selected based on name: "imap" variants use ImapProtocol, others need php-imap extension
+- Only the "imap" protocol variants (imap, imap4, imap4rev1) are supported; others throw `ProtocolNotSupportedException`
 - Message bodies are parsed into `$message->bodies['text']` and `$message->bodies['html']`
 - Attachments are automatically detected during body parsing
 - Connection state is managed - client reopens folders as needed
@@ -221,7 +216,6 @@ $message->delete($expunge = true);
 ## Type Safety Notes
 
 - **Connection Handling**: After `checkConnection()` or `getConnection()`, connection is guaranteed to be `AbstractProtocol`
-- **IDLE Operations**: `Folder::idle()` requires `ImapProtocol` (not available in LegacyProtocol)
 - **Magic Properties**: Message, Attachment, and other classes use magic `__get()/__set()` extensively
   - Properties are dynamically stored in `$attributes` array
   - PHPDoc `@property` tags document available magic properties
@@ -232,4 +226,38 @@ $message->delete($expunge = true);
 - **Boolean vs Int**:
   - `cert_validation` is stored as bool internally
   - `fetchBody` and `fetchFlags` are bool, not int
-- **WhereQuery Values**: The `where()` method accepts mixed values (string, Carbon, int, arrays)
+- **WhereQuery Values**: The `where()` method accepts mixed values (string, DateTimeInterface, int, arrays)
+
+## Gotchas
+
+### Messages and attributes
+
+- `Message::$attributes` holds more than `Attribute` objects: `uid`, `msgn` and `size` are `int|null`, so the `@var` is `array<string, Attribute|int|null>`.
+- `Message::$messageId` is an `Attribute` object, not a string. Call `->first()` (or cast) for thread comparisons and before passing it as a string parameter.
+- `Message::get()` has an outer `isset($this->attributes[$name])` check that returns early, so no `case` of the `switch` below it needs its own `isset`.
+- `peek()` and flag comparisons: `FlagCollection` returns `null` or a flag string, so compare with `=== null` / `!== null`, never `== null`.
+- After `make()` always check the result for `null` before calling methods on it (the `populate()` pattern in `Query.php`).
+- `getByUidLower()` means `$id < $uid`, `getByUidLowerThan()` means `$id <= $uid`; the docblock of a new `getByUidXxx()` method must describe exactly that.
+
+### snake_case to camelCase
+
+- Only PHP properties and parameters are camelCase. Config array keys (`validate_cert`, `fetch_body`, ...) stay snake_case; `Client::setAccountConfig()` bridges them with `UnicodeString::camel()`.
+- IMAP headers arrive as snake_case (`reply_to`, `in_reply_to`), so `Message::__call()` and `Attachment::__call()` use `UnicodeString::camel()` (magic properties are camelCase, e.g. `imgSrc`), not `->snake()`.
+- `AttachmentMask` reads `$this->parent->contentType` directly and not through getters; keep it in step when renaming properties.
+- PhpStorm's rename refactoring also renames string literals in `ClientManager::get()` calls: check config keys in string arguments by hand afterwards.
+
+### Headers
+
+- `Header` never calls `ext-imap` or `ext-mailparse`: encoded words go through `MimeHeader::decode()` (or `iconv_mime_decode()` for decoder `iconv`), addresses through `AddressListParser`. Results must not depend on loaded extensions.
+- `Address::$host` is `UNKNOWN` for a mailbox without host, and a group yields marker entries (start: only `mailbox`, end: empty), exactly like c-client; `HeaderAddressTest` pins this.
+- Raw bytes in headers (not encoded words) are kept as they are; do not run them through `mb_decode_mimeheader()`.
+- PHP below 8.4.28 is not supported: its `mb_decode_mimeheader()` keeps the whitespace between adjacent encoded words.
+
+### Static analysis
+
+- On the protocol files PHPStan cannot narrow the return type of `fetch()` (`array<int, string|array<string,mixed>>|string`), so `flags()` and `sizes()` use `array<int, mixed>`.
+- `array_search()` returns `int<0,max>|false`, never `-1`. `mb_convert_encoding()` never returns `false` according to the current stubs. `iterable<int>` is not a subtype of `array`: for PHP-declared `array|false` returns use `array<int>`.
+- `sendRequest()` tokens need `(string)` for ints (`list<string|array{string,string}>`); `setUidCache()` from `fetch()` needs `array_values(array_map('intval', $fetched))` for `list<ImapUid>`.
+- A `@phpstan-ignore` that no longer matches becomes an error itself (`ignore.unmatchedIdentifier`): recheck the existing ignores after every fix. `Event::dispatch()` uses `new static()`, for which PHPStan reports `new.static` on abstract classes; that
+  line keeps `// @phpstan-ignore new.static (intentional: subclasses are always concrete)`.
+- Intelephense P1131 on `@return $this` is a known Intelephense limitation, not a PHPStan error; leave it.
