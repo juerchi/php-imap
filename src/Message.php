@@ -554,11 +554,8 @@ class Message
     {
         switch ($encoding) {
             case IMAP::MESSAGE_ENC_BINARY:
-                if (extension_loaded('imap')) {
-                    return base64_decode(\imap_binary($string));
-                }
-
-                return base64_decode($string);
+                // binary content already is the raw payload (base64_decode(imap_binary($string)) is an identity)
+                return $string;
 
             case IMAP::MESSAGE_ENC_BASE64:
                 return base64_decode($string);
