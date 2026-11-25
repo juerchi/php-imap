@@ -17,8 +17,9 @@ composer test
 # OR
 phpunit
 
-# Tests are located in tests/ directory
+# Tests are located in tests/ (tests/Unit/ mirrors src/: Header, AddressListParser/MimeHeader, Attribute, Message)
 # Test configuration: phpunit.xml
+# Tests must pass with and without ext-imap loaded: never make an expectation depend on an extension
 ```
 
 ### Code Quality
@@ -26,17 +27,13 @@ phpunit
 # Run Rector for automated refactoring (targets PHP 8.1)
 vendor/bin/rector process
 
-# Run PHPStan for static analysis
-vendor/bin/phpstan analyse src --level=3  # Recommended: 1 error remaining
-vendor/bin/phpstan analyse src --level=5  # Strict: 57 errors remaining
+# Run PHPStan for static analysis (phpstan.neon sets level 3)
+vendor/bin/phpstan analyse                # Level 3: no errors
+vendor/bin/phpstan analyse src --level=5  # Strict: 5 errors remaining (dead catch/ternary/while, unread $config of Structure)
 
-# PHPStan Status:
-# - Level 3 (critical errors): 1 error (96% reduction from original 23)
-# - Level 5 (strict analysis): 57 errors (72% reduction from original 202)
-# - Most remaining errors are flow analysis issues that can be suppressed
-
-# PHP CS Fixer is available but config is in .php-cs-fixer.cache
-# The project follows PHP CS standards
+# PHP CS Fixer (config: .php-cs-fixer.dist.php, risky rules needed)
+vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.dist.php --allow-risky=yes <changed files>
+# Only pass the files you changed: on the whole tree it reorders properties and reformats unrelated code
 ```
 
 ### Installation
@@ -122,12 +119,16 @@ All protocols handle:
 - `FolderCollection`: Collection of Folder objects
 - `AttachmentCollection`: Collection of Attachment objects
 - `FlagCollection`: Collection of message flags
-- All extend Illuminate's Collection for powerful data manipulation
+- All extend Doctrine's `ArrayCollection`
 
 **Masks** (`src/Support/Masks/`)
 - `MessageMask`: Default message transformation/presentation layer
 - `AttachmentMask`: Default attachment transformation layer
 - Customizable via client configuration for alternative representations
+
+**MimeHeader** (`src/Support/MimeHeader.php`)
+- `MimeHeader::decode()` decodes RFC 2047 encoded words (any charset, Q and B) and leaves the surrounding text untouched
+- Used for subjects, address names and attachment names; `mb_decode_mimeheader()` on a whole value would turn raw 8-bit characters into `?`
 
 **AddressListParser** (`src/Support/AddressListParser.php`)
 - Pure PHP RFC 5322 address list parser used by `Header`; its result is pinned to `imap_rfc822_parse_headers()` (c-client) by `tests/Unit/HeaderAddressTest.php`
@@ -225,7 +226,7 @@ $message->delete($expunge = true);
 - **Boolean vs Int**:
   - `cert_validation` is stored as bool internally
   - `fetchBody` and `fetchFlags` are bool, not int
-- **WhereQuery Values**: The `where()` method accepts mixed values (string, Carbon, int, arrays)
+- **WhereQuery Values**: The `where()` method accepts mixed values (string, DateTimeInterface, int, arrays)
 
 ## Gotchas
 
@@ -247,7 +248,9 @@ $message->delete($expunge = true);
 
 ### Headers
 
-- `Header` never calls `ext-imap` or `ext-mailparse`: encoded words go through `mb_decode_mimeheader()` (or `iconv_mime_decode()` for decoder `iconv`), addresses through `AddressListParser`. Results must not depend on loaded extensions.
+- `Header` never calls `ext-imap` or `ext-mailparse`: encoded words go through `MimeHeader::decode()` (or `iconv_mime_decode()` for decoder `iconv`), addresses through `AddressListParser`. Results must not depend on loaded extensions.
+- `Address::$host` is `UNKNOWN` for a mailbox without host, and a group yields marker entries (start: only `mailbox`, end: empty), exactly like c-client; `HeaderAddressTest` pins this.
+- Raw bytes in headers (not encoded words) are kept as they are; do not run them through `mb_decode_mimeheader()`.
 - PHP below 8.4.28 is not supported: its `mb_decode_mimeheader()` keeps the whitespace between adjacent encoded words.
 
 ### Static analysis

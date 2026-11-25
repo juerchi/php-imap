@@ -54,11 +54,6 @@ final class Attachment
 {
     private Message $oMessage;
 
-    /**
-     * Used config.
-     */
-    private array $config;
-
     private Part $part;
 
     /**
@@ -83,8 +78,6 @@ final class Attachment
 
     public function __construct(Message $oMessage, Part $part)
     {
-        $this->config = ClientManager::get('options');
-
         $this->oMessage = $oMessage;
         $this->part = $part;
         $this->partNumber = $part->partNumber;
