@@ -5,6 +5,9 @@ All notable changes to `webklex/php-imap` will be documented in this file.
 Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) principles.
 
 ## [UNRELEASED]
+
+
+## [9.0.0] - 2026-11-25
 ### Fixed
 - `Attribute::__toString()` no longer throws for `DateTimeImmutable` values (regression of the Carbon removal; parsing any header with a `Date` failed)
 - Encoded words in subjects and address names are now decoded without `ext-imap` as well (all charsets, Q and B encoding). Before, only UTF-8 subjects were decoded and address names stayed encoded
